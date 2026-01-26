@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Repar-Ando</title>
+    <link rel="icon" href="assets/icono.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="titlebar">
+      <div class="titlebar-title">Repar-Ando</div>
+      <div class="titlebar-section" id="titlebarSection">Alertas</div>
+      <div class="titlebar-controls">
+        <button class="titlebar-btn" id="minBtn" type="button" aria-label="Minimizar" data-i18n-aria-label="windowMinimize">
+          <svg class="titlebar-icon" viewBox="0 0 12 12" aria-hidden="true">
+            <rect x="2" y="6" width="8" height="1.6" rx="0.8"></rect>
+          </svg>
+        </button>
+        <button class="titlebar-btn" id="maxBtn" type="button" aria-label="Maximizar o restaurar" data-i18n-aria-label="windowMaximize">
+          <svg class="titlebar-icon" viewBox="0 0 12 12" aria-hidden="true">
+            <rect x="2.2" y="2.2" width="7.6" height="7.6" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+          </svg>
+        </button>
+        <button class="titlebar-btn close" id="closeBtn" type="button" aria-label="Cerrar" data-i18n-aria-label="windowClose">
+          <svg class="titlebar-icon" viewBox="0 0 12 12" aria-hidden="true">
+            <path d="M3 3 L9 9 M9 3 L3 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <header class="hero">
+      <div class="hero-content">
+        <button class="brand brand-btn" id="brandHomeBtn" type="button">
+          <span class="brand-mark">RA</span>
+          <div>
+            <h1>Repar-Ando</h1>
+            <p data-i18n="heroSubtitle">Calendario, checklist e inventario de PCs en un solo lugar.</p>
+          </div>
+        </button>
+        <div class="hero-actions">
+          <button id="addPcBtn" class="btn primary" data-i18n="btnAddPc">Agregar PC</button>
+          <button id="exportJsonBtn" class="btn ghost" data-i18n="btnExportJson">Exportar JSON</button>
+          <label class="btn ghost file-btn">
+            <span data-i18n="btnImportJson">Importar JSON</span>
+            <input id="importJsonInput" type="file" accept=".json" />
+          </label>
+          <button id="exportCsvBtn" class="btn ghost" data-i18n="btnExportCsv">Exportar CSV</button>
+          <label class="btn ghost file-btn">
+            <span data-i18n="btnImportCsv">Importar CSV</span>
+            <input
+              id="importCsvInput"
+              type="file"
+              accept=".csv,.tsv,.txt"
+            />
+          </label>
+        </div>
+      </div>
+      <button
+        class="tab-btn settings-btn"
+        type="button"
+        data-tab="configuracion"
+        aria-label="Configuracion"
+        title="Configuracion"
+        data-i18n-aria-label="sectionConfigTitle"
+        data-i18n-title="sectionConfigTitle"
+      >
+        <span class="tab-icon" aria-hidden="true">&#9881;</span>
+      </button>
+    </header>
+
+    <main>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      <div class="tabs" role="tablist" aria-label="Secciones" data-i18n-aria-label="sectionsLabel">
+        <button class="tab-btn active" type="button" data-tab="alertas" data-i18n="tabAlerts">
+          Alertas
+        </button>
+        <button class="tab-btn" type="button" data-tab="mantenimientos" data-i18n="tabMaintenance">
+          Mantenimientos
+        </button>
+        <button class="tab-btn" type="button" data-tab="inventario" data-i18n="tabInventory">
+          Inventario
+        </button>
+        <button class="tab-btn" type="button" data-tab="grupos" data-i18n="tabGroups">
+          Grupos
+        </button>
+        <button class="tab-btn" type="button" data-tab="ocultos" data-i18n="tabHidden">
+          Ocultos
+        </button>
+      </div>
+
+      <section class="panel tab-panel active" data-tab="alertas">
+        <div class="panel-header">
+          <h2 data-i18n="sectionAlertsTitle">Alertas de mantenimiento</h2>
+        </div>
+        <div class="alert-grid" id="alertGrid"></div>
+      </section>
+
+      <section class="panel tab-panel" data-tab="alertas">
+        <div class="panel-header">
+          <h2 data-i18n="sectionSummaryTitle">Resumen</h2>
+        </div>
+        <div class="summary-grid" id="summaryGrid"></div>
+        <div class="summary-chart">
+          <div class="summary-chart-header">
+            <h3 data-i18n="chartTitle">Mantenimientos por mes</h3>
+            <span class="summary-chart-note" data-i18n="chartNote">Ultimos 12 meses</span>
+          </div>
+          <canvas id="maintenanceChart" width="800" height="240" aria-label="Grafico de mantenimientos por mes" role="img" data-i18n-aria-label="chartAria"></canvas>
+          <div id="maintenanceChartLegend" class="chart-legend"></div>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" data-tab="mantenimientos">
+        <div class="panel-header">
+          <h2 data-i18n="sectionHistoryTitle">Historial de mantenimientos</h2>
+          <div class="panel-controls">
+            <label class="field-inline">
+              <span data-i18n="labelFrom">Desde</span>
+              <input id="historyFromInput" type="date" />
+            </label>
+            <label class="field-inline">
+              <span data-i18n="labelTo">Hasta</span>
+              <input id="historyToInput" type="date" />
+            </label>
+            <label class="field-inline">
+              <span data-i18n="labelType">Tipo</span>
+              <select id="historyTypeSelect">
+                <option value="" data-i18n="optionAll">Todos</option>
+                <option value="total" data-i18n="optionTotal">Total</option>
+                <option value="limpieza" data-i18n="optionCleaning">Limpieza</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="tableDate">Fecha</th>
+                <th data-i18n="tableEquipo">Equipo</th>
+                <th data-i18n="tableUsuario">Usuario</th>
+                <th data-i18n="tableTipo">Tipo</th>
+                <th data-i18n="tableTecnico">Tecnico</th>
+                <th data-i18n="tableNotas">Notas</th>
+                <th data-i18n="tableAcciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="maintenanceTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" data-tab="mantenimientos">
+        <div class="panel-header">
+          <h2 data-i18n="sectionRegisterTitle">Registrar mantenimiento</h2>
+        </div>
+        <form id="maintenanceForm" class="form-grid">
+          <label class="field">
+            <span data-i18n="labelUsuario">Usuario</span>
+            <select id="maintenanceUserSelect"></select>
+          </label>
+          <label class="field">
+            <span data-i18n="labelPC">PC</span>
+            <select id="maintenancePcSelect" required></select>
+          </label>
+          <label class="field">
+            <span data-i18n="labelType">Tipo</span>
+            <select id="maintenanceTypeSelect" required>
+              <option value="total" data-i18n="optionTotal">Total</option>
+              <option value="limpieza" data-i18n="optionCleaning">Limpieza</option>
+            </select>
+          </label>
+          <label class="field">
+            <span data-i18n="labelFecha">Fecha</span>
+            <input id="maintenanceDateInput" type="date" required />
+          </label>
+          <label class="field">
+            <span data-i18n="labelTecnico">Tecnico</span>
+            <input id="maintenanceTechInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="labelAdjuntos">Adjuntos</span>
+            <input
+              id="maintenanceAttachmentsInput"
+              type="file"
+              multiple
+            />
+          </label>
+          <label class="field field-span">
+            <span data-i18n="labelObservaciones">Observaciones</span>
+            <textarea id="maintenanceNotesInput" rows="3"></textarea>
+          </label>
+          <div class="field field-span actions">
+            <button id="clearFiltersBtn" type="button" class="btn ghost" data-i18n="btnClearFilter">
+              Borrar filtro
+            </button>
+            <button id="openChecklistBtn" type="button" class="btn ghost" data-i18n="btnOpenChecklist">
+              Abrir checklist (solo total)
+            </button>
+            <button type="submit" class="btn primary" data-i18n="btnSaveMaintenance">Guardar mantenimiento</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel tab-panel" data-tab="inventario">
+        <div class="panel-header">
+          <h2 data-i18n="sectionInventoryTitle">Inventario de PCs</h2>
+          <div class="panel-controls">
+            <input
+              id="searchInput"
+              class="search"
+              type="search"
+              placeholder="Buscar por usuario, equipo o IP..."
+              data-i18n-placeholder="searchPlaceholder"
+            />
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="tableUsuario">Usuario</th>
+                <th data-i18n="tableEquipo">Equipo</th>
+                <th data-i18n="tableIP">IP</th>
+                <th data-i18n="tableEstado">Estado</th>
+                <th data-i18n="tableGrupo">Grupo</th>
+                <th data-i18n="tableNotas">Notas</th>
+                <th data-i18n="tableUltimo">Ultimo mantenimiento</th>
+                <th data-i18n="tableProximo">Proximo</th>
+                <th data-i18n="tableAcciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="pcTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" data-tab="grupos">
+        <div class="panel-header">
+          <h2 data-i18n="sectionGroupsTitle">Grupos de equipos</h2>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionGroupCreateTitle">Crear / editar grupo</h3>
+          <form id="groupForm" class="form-grid">
+            <input id="groupIdInput" type="hidden" />
+            <label class="field">
+              <span data-i18n="labelNombre">Nombre</span>
+              <input id="groupNameInput" type="text" required />
+            </label>
+            <label class="field">
+              <span data-i18n="labelCadaMeses">Cada (meses)</span>
+              <input
+                id="groupIntervalInput"
+                type="number"
+                min="1"
+                value="3"
+                required
+              />
+            </label>
+            <label class="field">
+              <span data-i18n="labelAvisoDias">Aviso (dias)</span>
+              <input
+                id="groupAlertInput"
+                type="number"
+                min="0"
+                value="7"
+                required
+              />
+            </label>
+            <div class="field field-span actions">
+              <button id="groupCancelBtn" type="button" class="btn ghost" data-i18n="btnCancel">
+                Cancelar
+              </button>
+              <button type="submit" class="btn primary" data-i18n="btnSaveGroup">Guardar grupo</button>
+            </div>
+          </form>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="tableGrupo">Grupo</th>
+                  <th data-i18n="tableIntervalo">Intervalo</th>
+                  <th data-i18n="tableAviso">Aviso</th>
+                  <th data-i18n="tableEquipos">Equipos</th>
+                  <th data-i18n="tableAcciones">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="groupTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionGroupAssignTitle">Asignacion de grupos</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="tableUsuario">Usuario</th>
+                  <th data-i18n="tableEquipo">Equipo</th>
+                  <th data-i18n="tableGrupo">Grupo</th>
+                </tr>
+              </thead>
+              <tbody id="groupAssignTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" data-tab="configuracion">
+        <div class="panel-header">
+          <h2 data-i18n="sectionConfigTitle">Configuracion</h2>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionAlertsNextTitle">Alertas y proximos</h3>
+          <label class="switch">
+            <input id="startNextSwitch" type="checkbox" />
+            <span class="slider" aria-hidden="true"></span>
+            <span class="switch-label" data-i18n="switchShowNextLabel">Mostrar cartel Proximo</span>
+          </label>
+          <p class="helper-text">
+            <span data-i18n="helperShowNextLabel">Activa o desactiva la linea Proximo en las alertas.</span>
+          </p>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionLanguagesTitle">Idiomas</h3>
+          <label class="field-inline">
+            <span data-i18n="labelLanguage">Idioma</span>
+            <select id="languageSelect">
+              <option value="es" data-i18n="languageEs">Espanol</option>
+              <option value="en" data-i18n="languageEn">English</option>
+              <option value="pt" data-i18n="languagePt">Portugues</option>
+            </select>
+          </label>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionUpdatesTitle">Actualizaciones</h3>
+          <label class="field-inline">
+            <span data-i18n="labelUpdateMode">Modo</span>
+            <select id="updateModeSelect">
+              <option value="auto" data-i18n="updateModeAuto">Automaticas</option>
+              <option value="ask" data-i18n="updateModeAsk">Preguntar antes</option>
+            </select>
+          </label>
+          <p class="helper-text">
+            <span data-i18n="helperUpdateMode">
+              Elegi si queres descargar en automatico o pedir confirmacion.
+            </span>
+          </p>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionNotificationsTitle">Notificaciones</h3>
+          <label class="switch">
+            <input id="notificationsSwitch" type="checkbox" />
+            <span class="slider" aria-hidden="true"></span>
+            <span class="switch-label" data-i18n="switchNotifications">
+              Activar notificaciones al abrir
+            </span>
+          </label>
+          <label class="switch">
+            <input id="notificationSoundSwitch" type="checkbox" />
+            <span class="slider" aria-hidden="true"></span>
+            <span class="switch-label" data-i18n="switchNotificationSound">
+              Reproducir sonido con la notificacion
+            </span>
+          </label>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionThemeTitle">Apariencia</h3>
+          <label class="switch">
+            <input id="darkModeSwitch" type="checkbox" />
+            <span class="slider" aria-hidden="true"></span>
+            <span class="switch-label" data-i18n="switchDarkMode">
+              Activar modo oscuro
+            </span>
+          </label>
+          <label class="switch">
+            <input id="largeTextSwitch" type="checkbox" />
+            <span class="slider" aria-hidden="true"></span>
+            <span class="switch-label" data-i18n="switchLargeText">
+              Texto grande
+            </span>
+          </label>
+          <label class="switch">
+            <input id="highContrastSwitch" type="checkbox" />
+            <span class="slider" aria-hidden="true"></span>
+            <span class="switch-label" data-i18n="switchHighContrast">
+              Alto contraste
+            </span>
+          </label>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionDateFormatTitle">Formato de fecha</h3>
+          <label class="field-inline">
+            <span data-i18n="labelDateFormat">Formato</span>
+            <select id="dateFormatSelect">
+              <option value="locale" data-i18n="dateFormatLocale">Automatico</option>
+              <option value="DMY" data-i18n="dateFormatDMY">DD/MM/AAAA</option>
+              <option value="MDY" data-i18n="dateFormatMDY">MM/DD/AAAA</option>
+            </select>
+          </label>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionHistoryLimitTitle">Historial</h3>
+          <label class="field-inline">
+            <span data-i18n="labelHistoryLimit">Mantener ultimos</span>
+            <input id="historyLimitInput" type="number" min="1" max="50" />
+            <span data-i18n="labelHistoryItems">registros</span>
+          </label>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionBackupTitle">Auto-backup</h3>
+          <label class="switch">
+            <input id="autoBackupSwitch" type="checkbox" />
+            <span class="slider" aria-hidden="true"></span>
+            <span class="switch-label" data-i18n="switchAutoBackup">
+              Guardar un backup semanal
+            </span>
+          </label>
+          <p class="helper-text">
+            <span data-i18n="helperAutoBackup">Se descargara un JSON cuando pase 1 semana.</span>
+          </p>
+        </div>
+        <div class="panel-sub">
+          <h3 data-i18n="sectionExportTitle">Exportaciones</h3>
+          <button id="exportAllBtn" class="btn ghost" type="button" data-i18n="btnExportAll">
+            Exportar todo
+          </button>
+        </div>
+        <footer class="brand-footer">
+          <div class="brand-footer-main">
+            <img src="assets/logo-whittall.png" alt="Sistemas Whittall" />
+            <div>
+              <h3 data-i18n="footerTitle">Hecho por Sistemas Whittall</h3>
+              <p class="helper-text">
+                <span data-i18n="footerSubtitle">Contactanos si necesitas un programa como este.</span>
+              </p>
+            </div>
+          </div>
+          <div class="brand-actions">
+            <a class="btn ghost icon-btn" href="https://mail.google.com/mail/?view=cm&fs=1&to=neyennahuel@gmail.com" aria-label="Email" data-external-link data-i18n-aria-label="ariaEmail">
+              <span aria-hidden="true">@</span>
+              <span data-i18n="btnEmail">Email</span>
+            </a>
+            <a class="btn ghost icon-btn" href="https://www.linkedin.com/in/nahuel-whittall/" target="_blank" rel="noreferrer" aria-label="LinkedIn" data-external-link data-i18n-aria-label="ariaLinkedIn">
+              <span aria-hidden="true">in</span>
+              <span data-i18n="btnLinkedIn">LinkedIn</span>
+            </a>
+            <button class="btn ghost icon-btn" type="button" disabled aria-label="Instagram (proximamente)" data-i18n-aria-label="ariaInstagram">
+              <span aria-hidden="true">ig</span>
+              <span data-i18n="btnInstagram">Instagram (pronto)</span>
+            </button>
+          </div>
+        </footer>
+      </section>
+
+      <section class="panel tab-panel" data-tab="ocultos">
+        <div class="panel-header">
+          <h2 data-i18n="sectionHiddenTitle">Mantenimientos ocultos</h2>
+          <div class="panel-controls">
+            <button id="clearHiddenBtn" class="btn danger" type="button" data-i18n="btnClearHidden">
+              Borrar todos
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="tableDate">Fecha</th>
+                <th data-i18n="tableEquipo">Equipo</th>
+                <th data-i18n="tableUsuario">Usuario</th>
+                <th data-i18n="tableTipo">Tipo</th>
+                <th data-i18n="tableTecnico">Tecnico</th>
+                <th data-i18n="tableNotas">Notas</th>
+                <th data-i18n="tableAcciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="hiddenMaintenanceTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="pcDialog" class="dialog">
+      <form id="pcForm" class="dialog-content">
+        <h3 id="pcDialogTitle" data-i18n="pcDialogNew">Nueva PC</h3>
+        <input id="pcIdInput" type="hidden" />
+        <label class="field">
+          <span data-i18n="labelUsuario">Usuario</span>
+          <input id="pcUserInput" type="text" required />
+        </label>
+        <label class="field">
+          <span data-i18n="labelEquipo">Equipo</span>
+          <input id="pcEquipoInput" type="text" required />
+        </label>
+        <label class="field">
+          <span data-i18n="labelIP">IP</span>
+          <input id="pcIpInput" type="text" required />
+        </label>
+        <label class="field">
+          <span data-i18n="labelGrupo">Grupo</span>
+          <select id="pcGroupSelect"></select>
+        </label>
+        <label class="field">
+          <span data-i18n="labelEstado">Estado</span>
+          <select id="pcStatusSelect">
+            <option value="activo" data-i18n="statusActive">Activo</option>
+            <option value="stock" data-i18n="statusStock">Stock</option>
+            <option value="baja" data-i18n="statusBaja">Baja</option>
+          </select>
+        </label>
+        <label class="field field-span">
+          <span data-i18n="labelNotas">Notas</span>
+          <textarea id="pcNotesInput" rows="3"></textarea>
+        </label>
+        <div class="actions">
+          <button type="button" class="btn danger action-delete is-hidden" id="pcDeleteBtn" data-i18n="btnDeletePc">
+            Eliminar PC
+          </button>
+          <button type="button" class="btn ghost" id="pcCancelBtn" data-i18n="btnCancel">Cancelar</button>
+          <button type="submit" class="btn primary" data-i18n="btnSave">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="checklistDialog" class="dialog wide">
+      <form id="checklistForm" class="dialog-content">
+        <h3 data-i18n="checklistTitle">Checklist de mantenimiento total</h3>
+        <div id="checklistContainer" class="checklist"></div>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="checklistCancelBtn" data-i18n="btnClose">
+            Cerrar
+          </button>
+          <button type="button" class="btn ghost" id="checklistClearBtn" data-i18n="btnClear">
+            Limpiar
+          </button>
+          <button type="submit" class="btn primary" data-i18n="btnSaveChecklist">Guardar checklist</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="checklistViewDialog" class="dialog wide">
+      <div class="dialog-content">
+        <h3 id="checklistViewTitle" data-i18n="checklistViewTitle">Checklist ultimo mantenimiento</h3>
+        <div id="checklistViewContainer" class="checklist"></div>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="checklistViewCloseBtn" data-i18n="btnClose">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="attachmentsDialog" class="dialog wide">
+      <div class="dialog-content">
+        <h3 data-i18n="attachmentsTitle">Adjuntos del mantenimiento</h3>
+        <div id="attachmentsContainer" class="attachments"></div>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="attachmentsCloseBtn" data-i18n="btnClose">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="confirmDialog" class="dialog">
+      <div class="dialog-content confirm-dialog">
+        <h3 id="confirmDialogTitle" data-i18n="confirmTitle">Confirmar</h3>
+        <p id="confirmDialogMessage" class="dialog-message"></p>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="confirmCancelBtn" data-i18n="btnCancel">
+            Cancelar
+          </button>
+          <button type="button" class="btn danger" id="confirmOkBtn" data-i18n="btnConfirm">
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
+
+
+
+

@@ -463,7 +463,11 @@ const i18n = {
     confirmDeletePc: "Eliminar la PC '{equipo}' de {usuario}? Se borrara su historial.",
     confirmDeleteHidden: "Eliminar este mantenimiento oculto definitivamente?",
     updateAvailableTitle: "Actualizacion disponible",
-    updateAvailableMessage: "Hay una nueva version ({version}). Queres descargarla ahora?",
+    updateAvailableMessage:
+      "Hay una nueva version ({version}). Queres descargarla ahora? (La actualizacion no borra los datos cargados)",
+    updateDownloadingTitle: "Descargando actualizacion",
+    updateDownloadingMessage:
+      "Estamos descargando la actualizacion. Espera unos segundos...",
     updateDownloadedTitle: "Actualizacion lista",
     updateDownloadedMessage: "La actualizacion se descargo. Queres reiniciar ahora?",
     updateDownloadBtn: "Descargar",
@@ -472,7 +476,8 @@ const i18n = {
     updateError: "No se pudo buscar actualizaciones.",
     toastConfigSaved: "Configuracion guardada.",
     notificationTitle: "Repar-Ando",
-    notificationBody: "Tenes {count} PC(s) con mantenimiento pendiente.",
+    notificationBody:
+      "No te olvides: tenes {count} mantenimiento(s) pendiente(s).",
     backupDone: "Backup descargado.",
     toastMaintenanceSaved: "Mantenimiento guardado.",
     toastMaintenanceUpdated: "Mantenimiento actualizado.",
@@ -689,7 +694,11 @@ const i18n = {
     confirmDeletePc: "Delete PC '{equipo}' for {usuario}? Its history will be removed.",
     confirmDeleteHidden: "Delete this hidden maintenance permanently?",
     updateAvailableTitle: "Update available",
-    updateAvailableMessage: "A new version is available ({version}). Download it now?",
+    updateAvailableMessage:
+      "A new version is available ({version}). Download it now? (Your data will not be deleted)",
+    updateDownloadingTitle: "Downloading update",
+    updateDownloadingMessage:
+      "We are downloading the update. Please wait a few seconds...",
     updateDownloadedTitle: "Update ready",
     updateDownloadedMessage: "The update was downloaded. Restart now?",
     updateDownloadBtn: "Download",
@@ -698,7 +707,8 @@ const i18n = {
     updateError: "Could not check for updates.",
     toastConfigSaved: "Settings saved.",
     notificationTitle: "Repar-Ando",
-    notificationBody: "You have {count} PC(s) with maintenance pending.",
+    notificationBody:
+      "Don’t forget: you have {count} pending maintenance item(s).",
     backupDone: "Backup downloaded.",
     toastMaintenanceSaved: "Maintenance saved.",
     toastMaintenanceUpdated: "Maintenance updated.",
@@ -913,7 +923,11 @@ const i18n = {
     confirmDeletePc: "Excluir o PC '{equipo}' de {usuario}? O historico sera removido.",
     confirmDeleteHidden: "Excluir esta manutencao oculta definitivamente?",
     updateAvailableTitle: "Atualizacao disponivel",
-    updateAvailableMessage: "Uma nova versao esta disponivel ({version}). Baixar agora?",
+    updateAvailableMessage:
+      "Uma nova versao esta disponivel ({version}). Baixar agora? (A atualizacao nao apaga os dados)",
+    updateDownloadingTitle: "Baixando atualizacao",
+    updateDownloadingMessage:
+      "Estamos baixando a atualizacao. Aguarde alguns segundos...",
     updateDownloadedTitle: "Atualizacao pronta",
     updateDownloadedMessage: "A atualizacao foi baixada. Reiniciar agora?",
     updateDownloadBtn: "Baixar",
@@ -922,7 +936,8 @@ const i18n = {
     updateError: "Nao foi possivel buscar atualizacoes.",
     toastConfigSaved: "Configuracao salva.",
     notificationTitle: "Repar-Ando",
-    notificationBody: "Voce tem {count} PC(s) com manutencao pendente.",
+    notificationBody:
+      "Nao esqueca: voce tem {count} manutencao(oes) pendente(s).",
     backupDone: "Backup baixado.",
     toastMaintenanceSaved: "Manutencao salva.",
     toastMaintenanceUpdated: "Manutencao atualizada.",
@@ -1076,6 +1091,7 @@ const confirmDialogTitle = document.getElementById("confirmDialogTitle");
 const confirmDialogMessage = document.getElementById("confirmDialogMessage");
 const confirmCancelBtn = document.getElementById("confirmCancelBtn");
 const confirmOkBtn = document.getElementById("confirmOkBtn");
+const updateLoadingDialog = document.getElementById("updateLoadingDialog");
 const exportDialog = document.getElementById("exportDialog");
 const importDialog = document.getElementById("importDialog");
 const exportJsonOption = document.getElementById("exportJsonOption");
@@ -2999,6 +3015,16 @@ function resolveConfirm(result) {
   resolve(result);
 }
 
+function openUpdateLoading() {
+  if (!updateLoadingDialog) return;
+  updateLoadingDialog.showModal();
+}
+
+function closeUpdateLoading() {
+  if (!updateLoadingDialog) return;
+  updateLoadingDialog.close();
+}
+
 function openSimpleDialog(dialog) {
   if (!dialog) return;
   dialog.showModal();
@@ -3073,6 +3099,13 @@ if (confirmOkBtn) {
 if (confirmDialog) {
   confirmDialog.addEventListener("close", () => {
     resolveConfirm(confirmDialog.returnValue === "confirm");
+  });
+}
+
+if (updateLoadingDialog) {
+  updateLoadingDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    updateLoadingDialog.close();
   });
 }
 
@@ -3223,6 +3256,7 @@ if (window.appUpdates) {
   window.appUpdates.onUpdateAvailable(async (info) => {
     if ((settings.updateMode || "ask") === "auto") {
       showToast(t("updateDownloading"));
+      openUpdateLoading();
       return;
     }
     const confirmed = await openConfirmDialog({
@@ -3236,10 +3270,12 @@ if (window.appUpdates) {
     if (confirmed) {
       window.appUpdates.download();
       showToast(t("updateDownloading"));
+      openUpdateLoading();
     }
   });
 
   window.appUpdates.onUpdateDownloaded(async () => {
+    closeUpdateLoading();
     const confirmed = await openConfirmDialog({
       title: t("updateDownloadedTitle"),
       message: t("updateDownloadedMessage"),
@@ -3252,6 +3288,7 @@ if (window.appUpdates) {
   });
 
   window.appUpdates.onUpdateError(() => {
+    closeUpdateLoading();
     showToast(t("updateError"));
   });
 }

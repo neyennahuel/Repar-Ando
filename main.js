@@ -126,7 +126,8 @@ ipcMain.on("notify", (event, payload) => {
   const { title, body } = payload;
   if (!title || !body) return;
   if (!Notification.isSupported()) return;
-  new Notification({ title, body }).show();
+  const iconPath = path.join(__dirname, "assets", "icono.png");
+  new Notification({ title, body, icon: iconPath }).show();
 });
 
 ipcMain.on("updates:set-mode", (event, mode) => {

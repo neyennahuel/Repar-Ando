@@ -1,6 +1,6 @@
 {
   "name": "repar-ando",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Gestion de mantenimiento local",
   "main": "main.js",
   "scripts": {
@@ -32,8 +32,6 @@
     ],
     "win": {
       "icon": "assets/icono.ico",
-      "signAndEditExecutable": false,
-      "verifyUpdateCodeSignature": false,
       "target": [
         "nsis",
         "portable"

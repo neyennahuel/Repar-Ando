@@ -1,5 +1,4 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, Notification } = require("electron");
-const { autoUpdater } = require("electron-updater");
 const path = require("path");
 
 if (process.env.NODE_ENV === "development") {
@@ -12,6 +11,7 @@ if (process.env.NODE_ENV === "development") {
 
 let mainWindow = null;
 let updateMode = "ask";
+let autoUpdater = null;
 
 function sendUpdateEvent(channel, payload) {
   if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -19,6 +19,7 @@ function sendUpdateEvent(channel, payload) {
 }
 
 function configureAutoUpdater(mode) {
+  if (!autoUpdater) return;
   updateMode = mode === "auto" ? "auto" : "ask";
   autoUpdater.autoDownload = updateMode === "auto";
 }
@@ -75,10 +76,17 @@ app.whenReady().then(() => {
   createWindow();
 
   if (app.isPackaged) {
-    configureAutoUpdater("ask");
-    autoUpdater.checkForUpdates().catch(() => {
-      // ignore
-    });
+    try {
+      // Lazy-load updater so dev mode doesn't crash.
+      ({ autoUpdater } = require("electron-updater"));
+      wireUpdaterEvents();
+      configureAutoUpdater("ask");
+      autoUpdater.checkForUpdates().catch(() => {
+        // ignore
+      });
+    } catch {
+      // ignore updater failures in production bootstrap
+    }
   }
 
   app.on("activate", () => {
@@ -126,7 +134,7 @@ ipcMain.on("updates:set-mode", (event, mode) => {
 });
 
 ipcMain.handle("updates:check", async () => {
-  if (!app.isPackaged) return null;
+  if (!app.isPackaged || !autoUpdater) return null;
   try {
     return await autoUpdater.checkForUpdates();
   } catch {
@@ -136,7 +144,7 @@ ipcMain.handle("updates:check", async () => {
 });
 
 ipcMain.handle("updates:download", async () => {
-  if (!app.isPackaged) return;
+  if (!app.isPackaged || !autoUpdater) return;
   try {
     return await autoUpdater.downloadUpdate();
   } catch {
@@ -146,30 +154,34 @@ ipcMain.handle("updates:download", async () => {
 });
 
 ipcMain.handle("updates:install", () => {
-  if (!app.isPackaged) return;
+  if (!app.isPackaged || !autoUpdater) return;
   autoUpdater.quitAndInstall();
 });
 
-autoUpdater.on("update-available", (info) => {
-  sendUpdateEvent("updates:available", info);
-  if (updateMode === "auto") {
-    autoUpdater.downloadUpdate().catch(() => {
-      sendUpdateEvent("updates:error");
-    });
-  }
-});
+function wireUpdaterEvents() {
+  if (!autoUpdater) return;
+  autoUpdater.on("update-available", (info) => {
+    sendUpdateEvent("updates:available", info);
+    if (updateMode === "auto") {
+      autoUpdater.downloadUpdate().catch(() => {
+        sendUpdateEvent("updates:error");
+      });
+    }
+  });
 
-autoUpdater.on("update-downloaded", (info) => {
-  sendUpdateEvent("updates:downloaded", info);
-});
+  autoUpdater.on("update-downloaded", (info) => {
+    sendUpdateEvent("updates:downloaded", info);
+  });
 
-autoUpdater.on("download-progress", (progress) => {
-  sendUpdateEvent("updates:progress", progress);
-});
+  autoUpdater.on("download-progress", (progress) => {
+    sendUpdateEvent("updates:progress", progress);
+  });
 
-autoUpdater.on("error", (error) => {
-  sendUpdateEvent("updates:error", error);
-});
+  autoUpdater.on("error", (error) => {
+    sendUpdateEvent("updates:error", error);
+  });
+}
+
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

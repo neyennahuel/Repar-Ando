@@ -40,20 +40,10 @@
         </button>
         <div class="hero-actions">
           <button id="addPcBtn" class="btn primary" data-i18n="btnAddPc">Agregar PC</button>
-          <button id="exportJsonBtn" class="btn ghost" data-i18n="btnExportJson">Exportar JSON</button>
-          <label class="btn ghost file-btn">
-            <span data-i18n="btnImportJson">Importar JSON</span>
-            <input id="importJsonInput" type="file" accept=".json" />
-          </label>
-          <button id="exportCsvBtn" class="btn ghost" data-i18n="btnExportCsv">Exportar CSV</button>
-          <label class="btn ghost file-btn">
-            <span data-i18n="btnImportCsv">Importar CSV</span>
-            <input
-              id="importCsvInput"
-              type="file"
-              accept=".csv,.tsv,.txt"
-            />
-          </label>
+          <button id="exportBtn" class="btn ghost" data-i18n="btnExport">Exportar</button>
+          <button id="importBtn" class="btn ghost" data-i18n="btnImport">Importar</button>
+          <input id="importJsonInput" type="file" accept=".json" hidden />
+          <input id="importCsvInput" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls" hidden />
         </div>
       </div>
       <button
@@ -579,6 +569,47 @@
       </div>
     </dialog>
 
+    <dialog id="exportDialog" class="dialog">
+      <div class="dialog-content confirm-dialog">
+        <h3 data-i18n="exportDialogTitle">Exportar</h3>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="exportJsonOption" data-i18n="btnExportJson">
+            Exportar JSON
+          </button>
+          <button type="button" class="btn ghost" id="exportCsvOption" data-i18n="btnExportCsv">
+            Exportar CSV
+          </button>
+          <button type="button" class="btn ghost" id="exportExcelOption" data-i18n="btnExportExcel">
+            Exportar Excel
+          </button>
+          <button type="button" class="btn ghost" id="exportCloseBtn" data-i18n="btnClose">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="importDialog" class="dialog">
+      <div class="dialog-content confirm-dialog">
+        <h3 data-i18n="importDialogTitle">Importar</h3>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="importJsonOption" data-i18n="btnImportJson">
+            Importar JSON
+          </button>
+          <button type="button" class="btn ghost" id="importCsvOption" data-i18n="btnImportCsv">
+            Importar CSV
+          </button>
+          <button type="button" class="btn ghost" id="importExcelOption" data-i18n="btnImportExcel">
+            Importar Excel
+          </button>
+          <button type="button" class="btn ghost" id="importCloseBtn" data-i18n="btnClose">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

@@ -290,7 +290,11 @@ const i18n = {
     btnExportJson: "Exportar JSON",
     btnImportJson: "Importar JSON",
     btnExportCsv: "Exportar CSV",
+    btnExportExcel: "Exportar Excel",
     btnImportCsv: "Importar CSV",
+    btnExport: "Exportar",
+    btnImport: "Importar",
+    btnImportExcel: "Importar Excel",
     tabAlerts: "Alertas",
     tabMaintenance: "Mantenimientos",
     tabInventory: "Inventario",
@@ -453,6 +457,8 @@ const i18n = {
     actionViewAttachments: "Adjuntos",
     actionEditRecord: "Editar",
     confirmTitle: "Confirmar",
+    exportDialogTitle: "Exportar",
+    importDialogTitle: "Importar",
     confirmDeleteGroup: "Eliminar el grupo '{name}'? Los equipos pasaran a {defaultGroup}.",
     confirmDeletePc: "Eliminar la PC '{equipo}' de {usuario}? Se borrara su historial.",
     confirmDeleteHidden: "Eliminar este mantenimiento oculto definitivamente?",
@@ -481,10 +487,13 @@ const i18n = {
     alertNotTotalLast: "El ultimo mantenimiento no fue total.",
     alertAttachmentsRead: "No se pudieron leer los adjuntos.",
     alertImportJson: "No se pudo importar el JSON. Verifica el formato.",
+    alertImportSpreadsheet: "No se pudo importar el archivo. Verifica el formato.",
+    alertExportSpreadsheet: "No se pudo exportar el Excel.",
     checklistTitleWithDate: "Checklist mantenimiento: {equipo} ({date})",
     checklistTitleLast: "Checklist ultimo mantenimiento: {equipo}",
     exportJsonFilename: "repar-ando-datos.json",
     exportCsvFilename: "repar-ando-inventario.csv",
+    exportExcelFilename: "repar-ando-inventario.xlsx",
     csvUsuario: "usuario",
     csvEquipo: "equipo",
     csvIp: "ip",
@@ -508,7 +517,11 @@ const i18n = {
     btnExportJson: "Export JSON",
     btnImportJson: "Import JSON",
     btnExportCsv: "Export CSV",
+    btnExportExcel: "Export Excel",
     btnImportCsv: "Import CSV",
+    btnExport: "Export",
+    btnImport: "Import",
+    btnImportExcel: "Import Excel",
     tabAlerts: "Alerts",
     tabMaintenance: "Maintenance",
     tabInventory: "Inventory",
@@ -670,6 +683,8 @@ const i18n = {
     actionViewAttachments: "Attachments",
     actionEditRecord: "Edit",
     confirmTitle: "Confirm",
+    exportDialogTitle: "Export",
+    importDialogTitle: "Import",
     confirmDeleteGroup: "Delete group '{name}'? PCs will move to {defaultGroup}.",
     confirmDeletePc: "Delete PC '{equipo}' for {usuario}? Its history will be removed.",
     confirmDeleteHidden: "Delete this hidden maintenance permanently?",
@@ -698,10 +713,13 @@ const i18n = {
     alertNotTotalLast: "Last maintenance was not total.",
     alertAttachmentsRead: "Could not read attachments.",
     alertImportJson: "Could not import JSON. Check the format.",
+    alertImportSpreadsheet: "Could not import the file. Check the format.",
+    alertExportSpreadsheet: "Could not export the spreadsheet.",
     checklistTitleWithDate: "Maintenance checklist: {equipo} ({date})",
     checklistTitleLast: "Last maintenance checklist: {equipo}",
     exportJsonFilename: "repar-ando-data.json",
     exportCsvFilename: "repar-ando-inventory.csv",
+    exportExcelFilename: "repar-ando-inventory.xlsx",
     csvUsuario: "user",
     csvEquipo: "pc",
     csvIp: "ip",
@@ -724,7 +742,11 @@ const i18n = {
     btnExportJson: "Exportar JSON",
     btnImportJson: "Importar JSON",
     btnExportCsv: "Exportar CSV",
+    btnExportExcel: "Exportar Excel",
     btnImportCsv: "Importar CSV",
+    btnExport: "Exportar",
+    btnImport: "Importar",
+    btnImportExcel: "Importar Excel",
     tabAlerts: "Alertas",
     tabMaintenance: "Manutencoes",
     tabInventory: "Inventario",
@@ -885,6 +907,8 @@ const i18n = {
     actionViewAttachments: "Anexos",
     actionEditRecord: "Editar",
     confirmTitle: "Confirmar",
+    exportDialogTitle: "Exportar",
+    importDialogTitle: "Importar",
     confirmDeleteGroup: "Excluir o grupo '{name}'? Os PCs irao para {defaultGroup}.",
     confirmDeletePc: "Excluir o PC '{equipo}' de {usuario}? O historico sera removido.",
     confirmDeleteHidden: "Excluir esta manutencao oculta definitivamente?",
@@ -913,10 +937,13 @@ const i18n = {
     alertNotTotalLast: "A ultima manutencao nao foi total.",
     alertAttachmentsRead: "Nao foi possivel ler os anexos.",
     alertImportJson: "Nao foi possivel importar o JSON. Verifique o formato.",
+    alertImportSpreadsheet: "Nao foi possivel importar o arquivo. Verifique o formato.",
+    alertExportSpreadsheet: "Nao foi possivel exportar o Excel.",
     checklistTitleWithDate: "Checklist manutencao: {equipo} ({date})",
     checklistTitleLast: "Checklist ultima manutencao: {equipo}",
     exportJsonFilename: "repar-ando-dados.json",
     exportCsvFilename: "repar-ando-inventario.csv",
+    exportExcelFilename: "repar-ando-inventario.xlsx",
     csvUsuario: "usuario",
     csvEquipo: "pc",
     csvIp: "ip",
@@ -1049,12 +1076,22 @@ const confirmDialogTitle = document.getElementById("confirmDialogTitle");
 const confirmDialogMessage = document.getElementById("confirmDialogMessage");
 const confirmCancelBtn = document.getElementById("confirmCancelBtn");
 const confirmOkBtn = document.getElementById("confirmOkBtn");
+const exportDialog = document.getElementById("exportDialog");
+const importDialog = document.getElementById("importDialog");
+const exportJsonOption = document.getElementById("exportJsonOption");
+const exportCsvOption = document.getElementById("exportCsvOption");
+const exportExcelOption = document.getElementById("exportExcelOption");
+const exportCloseBtn = document.getElementById("exportCloseBtn");
+const importJsonOption = document.getElementById("importJsonOption");
+const importCsvOption = document.getElementById("importCsvOption");
+const importExcelOption = document.getElementById("importExcelOption");
+const importCloseBtn = document.getElementById("importCloseBtn");
 
 const addPcBtn = document.getElementById("addPcBtn");
-const exportJsonBtn = document.getElementById("exportJsonBtn");
 const importJsonInput = document.getElementById("importJsonInput");
-const exportCsvBtn = document.getElementById("exportCsvBtn");
 const importCsvInput = document.getElementById("importCsvInput");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
 const clearHiddenBtn = document.getElementById("clearHiddenBtn");
 const tabButtons = document.querySelectorAll(".tab-btn");
 const tabPanels = document.querySelectorAll(".tab-panel");
@@ -2540,6 +2577,52 @@ function exportCsv() {
   downloadBlob(blob, t("exportCsvFilename"));
 }
 
+function exportExcel() {
+  if (typeof XLSX === "undefined" || !XLSX?.utils) {
+    alert(t("alertExportSpreadsheet"));
+    return;
+  }
+  const headers = [
+    t("csvUsuario"),
+    t("csvEquipo"),
+    t("csvIp"),
+    t("csvEstado"),
+    t("csvGrupo"),
+    t("csvNotasPc"),
+    t("csvUltimaFecha"),
+    t("csvUltimoTipo"),
+    t("csvNotas"),
+    t("csvTecnico"),
+  ];
+  const rows = state.data.pcs.map((pc) => {
+    const group = getGroupForPc(pc);
+    const status = pc.status || "activo";
+    const lastTypeLabel = pc.lastMaintenance?.type
+      ? getMaintenanceTypeLabel(pc.lastMaintenance.type)
+      : "";
+    return [
+      pc.usuario,
+      pc.equipo,
+      pc.ip,
+      getStatusLabel(status),
+      getGroupLabel(group),
+      pc.notes || "",
+      pc.lastMaintenance?.date || "",
+      lastTypeLabel,
+      pc.lastMaintenance?.notes || "",
+      pc.lastMaintenance?.technician || "",
+    ];
+  });
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario");
+  const output = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([output], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  downloadBlob(blob, t("exportExcelFilename"));
+}
+
 function escapeCsv(value) {
   const text = String(value ?? "");
   if (text.includes(",") || text.includes('"') || text.includes("\n")) {
@@ -2577,7 +2660,46 @@ function importJson(file) {
 }
 
 function importSpreadsheet(file) {
+  if (isExcelFile(file)) {
+    importExcelFile(file);
+    return;
+  }
   importDelimitedFile(file);
+}
+
+function isExcelFile(file) {
+  const name = String(file?.name || "").toLowerCase();
+  return (
+    name.endsWith(".xlsx") ||
+    name.endsWith(".xls") ||
+    String(file?.type || "").includes("spreadsheet")
+  );
+}
+
+function importExcelFile(file) {
+  if (typeof XLSX === "undefined" || !XLSX?.read) {
+    alert(t("alertImportSpreadsheet"));
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = new Uint8Array(reader.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = sheetName ? workbook.Sheets[sheetName] : null;
+      if (!sheet) throw new Error("Sheet not found");
+      const rows = XLSX.utils.sheet_to_json(sheet, {
+        header: 1,
+        raw: false,
+        defval: "",
+      });
+      importRows(rows);
+    } catch {
+      alert(t("alertImportSpreadsheet"));
+    }
+  };
+  reader.readAsArrayBuffer(file);
 }
 
 function importDelimitedFile(file) {
@@ -2877,6 +2999,24 @@ function resolveConfirm(result) {
   resolve(result);
 }
 
+function openSimpleDialog(dialog) {
+  if (!dialog) return;
+  dialog.showModal();
+}
+
+function closeSimpleDialog(dialog) {
+  if (!dialog) return;
+  dialog.close();
+}
+
+function triggerSpreadsheetImport(accept) {
+  if (!importCsvInput) return;
+  const previous = importCsvInput.accept;
+  if (accept) importCsvInput.accept = accept;
+  importCsvInput.click();
+  importCsvInput.accept = previous;
+}
+
 addPcBtn.addEventListener("click", () => openPcDialog());
 pcCancelBtn.addEventListener("click", closePcDialog);
 if (pcDeleteBtn) {
@@ -2933,6 +3073,20 @@ if (confirmOkBtn) {
 if (confirmDialog) {
   confirmDialog.addEventListener("close", () => {
     resolveConfirm(confirmDialog.returnValue === "confirm");
+  });
+}
+
+if (exportDialog) {
+  exportDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    exportDialog.close();
+  });
+}
+
+if (importDialog) {
+  importDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    importDialog.close();
   });
 }
 
@@ -3106,6 +3260,7 @@ if (exportAllBtn) {
   exportAllBtn.addEventListener("click", () => {
     exportJson();
     exportCsv();
+    exportExcel();
   });
 }
 
@@ -3218,16 +3373,66 @@ clearHiddenBtn.addEventListener("click", async () => {
   }
 });
 
-exportJsonBtn.addEventListener("click", exportJson);
 importJsonInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (file) importJson(file);
 });
-exportCsvBtn.addEventListener("click", exportCsv);
 importCsvInput.addEventListener("change", (event) => {
   const file = event.target.files[0];
   if (file) importSpreadsheet(file);
 });
+if (exportBtn) {
+  exportBtn.addEventListener("click", () => openSimpleDialog(exportDialog));
+}
+if (importBtn) {
+  importBtn.addEventListener("click", () => openSimpleDialog(importDialog));
+}
+if (exportJsonOption) {
+  exportJsonOption.addEventListener("click", () => {
+    exportJson();
+    closeSimpleDialog(exportDialog);
+  });
+}
+if (exportCsvOption) {
+  exportCsvOption.addEventListener("click", () => {
+    exportCsv();
+    closeSimpleDialog(exportDialog);
+  });
+}
+if (exportExcelOption) {
+  exportExcelOption.addEventListener("click", () => {
+    exportExcel();
+    closeSimpleDialog(exportDialog);
+  });
+}
+if (exportCloseBtn) {
+  exportCloseBtn.addEventListener("click", () =>
+    closeSimpleDialog(exportDialog)
+  );
+}
+if (importJsonOption) {
+  importJsonOption.addEventListener("click", () => {
+    closeSimpleDialog(importDialog);
+    if (importJsonInput) importJsonInput.click();
+  });
+}
+if (importCsvOption) {
+  importCsvOption.addEventListener("click", () => {
+    closeSimpleDialog(importDialog);
+    triggerSpreadsheetImport(".csv,.tsv,.txt");
+  });
+}
+if (importExcelOption) {
+  importExcelOption.addEventListener("click", () => {
+    closeSimpleDialog(importDialog);
+    triggerSpreadsheetImport(".xlsx,.xls");
+  });
+}
+if (importCloseBtn) {
+  importCloseBtn.addEventListener("click", () =>
+    closeSimpleDialog(importDialog)
+  );
+}
 
 maintenanceDateInput.value = toDateInputValue(new Date());
 openChecklistBtn.disabled = false;

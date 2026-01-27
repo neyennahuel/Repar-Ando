@@ -477,7 +477,7 @@ const i18n = {
     toastConfigSaved: "Configuracion guardada.",
     notificationTitle: "Repar-Ando",
     notificationBody:
-      "No te olvides: tenes {count} mantenimiento(s) pendiente(s).",
+      "No te olvides que tenes {count} mantenimientos pendientes.",
     backupDone: "Backup descargado.",
     toastMaintenanceSaved: "Mantenimiento guardado.",
     toastMaintenanceUpdated: "Mantenimiento actualizado.",
@@ -937,7 +937,7 @@ const i18n = {
     toastConfigSaved: "Configuracao salva.",
     notificationTitle: "Repar-Ando",
     notificationBody:
-      "Nao esqueca: voce tem {count} manutencao(oes) pendente(s).",
+      "Nao esqueca que voce tem {count} manutencao(oes) pendente(s).",
     backupDone: "Backup baixado.",
     toastMaintenanceSaved: "Manutencao salva.",
     toastMaintenanceUpdated: "Manutencao atualizada.",

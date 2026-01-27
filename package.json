@@ -22,6 +22,7 @@
     "appId": "com.whittall.reparando",
     "productName": "Repar-Ando",
     "asar": true,
+    "afterPack": "scripts/afterPack.js",
     "directories": {
       "output": "dist"
     },
@@ -32,6 +33,7 @@
     ],
     "win": {
       "icon": "assets/icono.ico",
+      "signAndEditExecutable": false,
       "target": [
         "nsis",
         "portable"

@@ -1,6 +1,6 @@
 {
   "name": "repar-ando",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Gestion de mantenimiento local",
   "main": "main.js",
   "scripts": {

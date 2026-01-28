@@ -2414,6 +2414,22 @@ function normalizeSupplyLink(value) {
   return `https://${link}`;
 }
 
+function parseLooseNumber(value) {
+  if (typeof value === "number") return value;
+  if (value === null || value === undefined) return NaN;
+  let text = String(value).trim();
+  if (!text) return NaN;
+  text = text.replace(/\s/g, "");
+  const hasComma = text.includes(",");
+  const hasDot = text.includes(".");
+  if (hasComma && hasDot) {
+    text = text.replace(/\./g, "").replace(",", ".");
+  } else if (hasComma && !hasDot) {
+    text = text.replace(",", ".");
+  }
+  return Number(text);
+}
+
 function readAttachments(fileList) {
   const files = Array.from(fileList || []);
   if (!files.length) return Promise.resolve([]);
@@ -2509,8 +2525,8 @@ async function handleMaintenanceSubmit(event) {
 function handleSupplySubmit(event) {
   event.preventDefault();
   const name = (supplyNameInput?.value || "").trim();
-  const quantity = Number(supplyQtyInput?.value);
-  const alertThreshold = Number(supplyAlertInput?.value);
+  const quantity = parseLooseNumber(supplyQtyInput?.value);
+  const alertThreshold = parseLooseNumber(supplyAlertInput?.value);
   if (!name || !Number.isFinite(quantity) || !Number.isFinite(alertThreshold)) {
     alert(t("alertSupplyRequired"));
     return;
@@ -3069,8 +3085,8 @@ function importSuppliesExcel(file) {
         const alert = useFallback ? row[2] : row[map.alert];
         const link = useFallback ? row[3] : row[map.link];
         const trimmedName = String(name || "").trim();
-        const quantity = Number(qty);
-        const alertThreshold = Number(alert);
+        const quantity = parseLooseNumber(qty);
+        const alertThreshold = parseLooseNumber(alert);
         if (!trimmedName) return;
         if (!Number.isFinite(quantity) || !Number.isFinite(alertThreshold)) return;
         state.data.supplies.push({

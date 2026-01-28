@@ -880,6 +880,21 @@ table {
   min-width: 720px;
 }
 
+.supply-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.supply-discount-input {
+  width: 90px;
+}
+
+.row-low-stock {
+  background: rgba(230, 57, 70, 0.08);
+}
+
 th,
 td {
   padding: 12px;

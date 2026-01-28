@@ -71,6 +71,9 @@
         <button class="tab-btn" type="button" data-tab="inventario" data-i18n="tabInventory">
           Inventario
         </button>
+        <button class="tab-btn" type="button" data-tab="insumos" data-i18n="tabSupplies">
+          Insumos
+        </button>
         <button class="tab-btn" type="button" data-tab="grupos" data-i18n="tabGroups">
           Grupos
         </button>
@@ -222,6 +225,62 @@
               </tr>
             </thead>
             <tbody id="pcTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel tab-panel" data-tab="insumos">
+        <div class="panel-header">
+          <h2 data-i18n="sectionSuppliesTitle">Insumos</h2>
+          <div class="panel-controls">
+            <button id="exportSuppliesExcelBtn" class="btn ghost" data-i18n="btnExportExcelSupplies">
+              Exportar Excel
+            </button>
+            <button id="importSuppliesExcelBtn" class="btn ghost" data-i18n="btnImportExcelSupplies">
+              Importar Excel
+            </button>
+            <input id="importSuppliesExcelInput" type="file" accept=".xlsx,.xls" hidden />
+          </div>
+        </div>
+        <form id="supplyForm" class="form-grid">
+          <label class="field">
+            <span data-i18n="labelSupplyName">Nombre</span>
+            <input id="supplyNameInput" type="text" required />
+          </label>
+          <label class="field">
+            <span data-i18n="labelSupplyQty">Cantidad</span>
+            <input id="supplyQtyInput" type="number" min="0" step="1" required />
+          </label>
+          <label class="field">
+            <span data-i18n="labelSupplyAlert">Alerta desde</span>
+            <input id="supplyAlertInput" type="number" min="0" step="1" required />
+          </label>
+          <label class="field">
+            <span data-i18n="labelSupplyLink">Link de compra (opcional)</span>
+            <input
+              id="supplyLinkInput"
+              type="text"
+              placeholder="https://..."
+              data-i18n-placeholder="placeholderSupplyLink"
+            />
+          </label>
+          <div class="field field-span actions">
+            <button type="submit" class="btn primary" data-i18n="btnSaveSupply">Guardar insumo</button>
+          </div>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="tableSupplyName">Insumo</th>
+                <th data-i18n="tableSupplyQty">Cantidad</th>
+                <th data-i18n="tableSupplyAlert">Alerta</th>
+                <th data-i18n="tableSupplyStatus">Estado</th>
+                <th data-i18n="tableSupplyLink">Link</th>
+                <th data-i18n="tableSupplyActions">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="suppliesTableBody"></tbody>
           </table>
         </div>
       </section>

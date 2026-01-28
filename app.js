@@ -266,6 +266,7 @@ function getChecklistTemplate() {
 const defaultData = {
   pcs: [],
   groups: [],
+  supplies: [],
 };
 
 const defaultSettings = {
@@ -291,13 +292,16 @@ const i18n = {
     btnImportJson: "Importar JSON",
     btnExportCsv: "Exportar CSV",
     btnExportExcel: "Exportar Excel",
+    btnExportExcelSupplies: "Exportar Excel",
     btnImportCsv: "Importar CSV",
     btnExport: "Exportar",
     btnImport: "Importar",
     btnImportExcel: "Importar Excel",
+    btnImportExcelSupplies: "Importar Excel",
     tabAlerts: "Alertas",
     tabMaintenance: "Mantenimientos",
     tabInventory: "Inventario",
+    tabSupplies: "Insumos",
     tabGroups: "Grupos",
     tabHidden: "Ocultos",
     tabConfig: "Configuracion",
@@ -332,12 +336,32 @@ const i18n = {
     btnOpenChecklist: "Abrir checklist (solo total)",
     btnSaveMaintenance: "Guardar mantenimiento",
     sectionInventoryTitle: "Inventario de PCs",
+    sectionSuppliesTitle: "Insumos",
+    labelSupplyName: "Nombre",
+    labelSupplyQty: "Cantidad",
+    labelSupplyAlert: "Alerta desde",
+    labelSupplyLink: "Link de compra (opcional)",
+    placeholderSupplyLink: "https://...",
+    btnSaveSupply: "Guardar insumo",
     searchPlaceholder: "Buscar por usuario, equipo o IP...",
     tableIP: "IP",
     tableEstado: "Estado",
     tableGrupo: "Grupo",
     tableUltimo: "Ultimo mantenimiento",
     tableProximo: "Proximo",
+    tableSupplyName: "Insumo",
+    tableSupplyQty: "Cantidad",
+    tableSupplyAlert: "Alerta",
+    tableSupplyStatus: "Estado",
+    tableSupplyLink: "Link",
+    tableSupplyActions: "Acciones",
+    linkOpen: "Comprar",
+    statusSupplyOk: "OK",
+    statusSupplyLow: "Bajo stock",
+    placeholderSupplyDiscount: "Cantidad",
+    btnApplyDiscount: "Descontar",
+    btnDeleteSupply: "Eliminar",
+    emptySupplies: "No hay insumos cargados.",
     sectionGroupsTitle: "Grupos de equipos",
     sectionGroupCreateTitle: "Crear / editar grupo",
     labelNombre: "Nombre",
@@ -462,6 +486,7 @@ const i18n = {
     confirmDeleteGroup: "Eliminar el grupo '{name}'? Los equipos pasaran a {defaultGroup}.",
     confirmDeletePc: "Eliminar la PC '{equipo}' de {usuario}? Se borrara su historial.",
     confirmDeleteHidden: "Eliminar este mantenimiento oculto definitivamente?",
+    confirmDeleteSupply: "Eliminar el insumo '{name}'?",
     updateAvailableTitle: "Actualizacion disponible",
     updateAvailableMessage:
       "Hay una nueva version ({version}). Queres descargarla ahora? (La actualizacion no borra los datos cargados)",
@@ -482,6 +507,10 @@ const i18n = {
     toastMaintenanceSaved: "Mantenimiento guardado.",
     toastMaintenanceUpdated: "Mantenimiento actualizado.",
     toastMaintenanceDeleted: "Mantenimiento eliminado.",
+    toastSupplyAdded: "Insumo guardado.",
+    toastSupplyDeleted: "Insumo eliminado.",
+    toastSupplyDiscounted: "Descuento aplicado.",
+    toastSuppliesImported: "Insumos importados: {count}.",
     toastPcDeleted: "PC eliminada.",
     toastChecklistRequired: "Completa el checklist antes de guardar.",
     toastHiddenRemoved: "Mantenimientos ocultos eliminados.",
@@ -490,6 +519,8 @@ const i18n = {
     alertNoMaintenance: "Este equipo no tiene mantenimiento registrado.",
     alertNotTotal: "El mantenimiento no fue total.",
     alertNotTotalLast: "El ultimo mantenimiento no fue total.",
+    alertSupplyInvalidDiscount: "Ingrese una cantidad valida para descontar.",
+    alertSupplyRequired: "Completa los campos obligatorios del insumo.",
     alertAttachmentsRead: "No se pudieron leer los adjuntos.",
     alertImportJson: "No se pudo importar el JSON. Verifica el formato.",
     alertImportSpreadsheet: "No se pudo importar el archivo. Verifica el formato.",
@@ -499,6 +530,8 @@ const i18n = {
     exportJsonFilename: "repar-ando-datos.json",
     exportCsvFilename: "repar-ando-inventario.csv",
     exportExcelFilename: "repar-ando-inventario.xlsx",
+    exportSuppliesExcelFilename: "repar-ando-insumos.xlsx",
+    suppliesSheetName: "Insumos",
     csvUsuario: "usuario",
     csvEquipo: "equipo",
     csvIp: "ip",
@@ -523,13 +556,16 @@ const i18n = {
     btnImportJson: "Import JSON",
     btnExportCsv: "Export CSV",
     btnExportExcel: "Export Excel",
+    btnExportExcelSupplies: "Export Excel",
     btnImportCsv: "Import CSV",
     btnExport: "Export",
     btnImport: "Import",
     btnImportExcel: "Import Excel",
+    btnImportExcelSupplies: "Import Excel",
     tabAlerts: "Alerts",
     tabMaintenance: "Maintenance",
     tabInventory: "Inventory",
+    tabSupplies: "Supplies",
     tabGroups: "Groups",
     tabHidden: "Hidden",
     tabConfig: "Settings",
@@ -563,12 +599,32 @@ const i18n = {
     btnOpenChecklist: "Open checklist (total only)",
     btnSaveMaintenance: "Save maintenance",
     sectionInventoryTitle: "PC inventory",
+    sectionSuppliesTitle: "Supplies",
+    labelSupplyName: "Name",
+    labelSupplyQty: "Quantity",
+    labelSupplyAlert: "Low stock at",
+    labelSupplyLink: "Purchase link (optional)",
+    placeholderSupplyLink: "https://...",
+    btnSaveSupply: "Save supply",
     searchPlaceholder: "Search by user, PC, or IP...",
     tableIP: "IP",
     tableEstado: "Status",
     tableGrupo: "Group",
     tableUltimo: "Last maintenance",
     tableProximo: "Next",
+    tableSupplyName: "Supply",
+    tableSupplyQty: "Quantity",
+    tableSupplyAlert: "Alert",
+    tableSupplyStatus: "Status",
+    tableSupplyLink: "Link",
+    tableSupplyActions: "Actions",
+    linkOpen: "Open",
+    statusSupplyOk: "OK",
+    statusSupplyLow: "Low stock",
+    placeholderSupplyDiscount: "Amount",
+    btnApplyDiscount: "Subtract",
+    btnDeleteSupply: "Delete",
+    emptySupplies: "No supplies yet.",
     sectionGroupsTitle: "PC groups",
     sectionGroupCreateTitle: "Create / edit group",
     labelNombre: "Name",
@@ -693,6 +749,7 @@ const i18n = {
     confirmDeleteGroup: "Delete group '{name}'? PCs will move to {defaultGroup}.",
     confirmDeletePc: "Delete PC '{equipo}' for {usuario}? Its history will be removed.",
     confirmDeleteHidden: "Delete this hidden maintenance permanently?",
+    confirmDeleteSupply: "Delete supply '{name}'?",
     updateAvailableTitle: "Update available",
     updateAvailableMessage:
       "A new version is available ({version}). Download it now? (Your data will not be deleted)",
@@ -713,6 +770,10 @@ const i18n = {
     toastMaintenanceSaved: "Maintenance saved.",
     toastMaintenanceUpdated: "Maintenance updated.",
     toastMaintenanceDeleted: "Maintenance deleted.",
+    toastSupplyAdded: "Supply saved.",
+    toastSupplyDeleted: "Supply deleted.",
+    toastSupplyDiscounted: "Stock updated.",
+    toastSuppliesImported: "Supplies imported: {count}.",
     toastPcDeleted: "PC deleted.",
     toastChecklistRequired: "Complete the checklist before saving.",
     toastHiddenRemoved: "Hidden maintenance removed.",
@@ -721,6 +782,8 @@ const i18n = {
     alertNoMaintenance: "This PC has no maintenance record.",
     alertNotTotal: "Maintenance was not total.",
     alertNotTotalLast: "Last maintenance was not total.",
+    alertSupplyInvalidDiscount: "Enter a valid amount to subtract.",
+    alertSupplyRequired: "Fill in the required supply fields.",
     alertAttachmentsRead: "Could not read attachments.",
     alertImportJson: "Could not import JSON. Check the format.",
     alertImportSpreadsheet: "Could not import the file. Check the format.",
@@ -730,6 +793,8 @@ const i18n = {
     exportJsonFilename: "repar-ando-data.json",
     exportCsvFilename: "repar-ando-inventory.csv",
     exportExcelFilename: "repar-ando-inventory.xlsx",
+    exportSuppliesExcelFilename: "repar-ando-supplies.xlsx",
+    suppliesSheetName: "Supplies",
     csvUsuario: "user",
     csvEquipo: "pc",
     csvIp: "ip",
@@ -753,13 +818,16 @@ const i18n = {
     btnImportJson: "Importar JSON",
     btnExportCsv: "Exportar CSV",
     btnExportExcel: "Exportar Excel",
+    btnExportExcelSupplies: "Exportar Excel",
     btnImportCsv: "Importar CSV",
     btnExport: "Exportar",
     btnImport: "Importar",
     btnImportExcel: "Importar Excel",
+    btnImportExcelSupplies: "Importar Excel",
     tabAlerts: "Alertas",
     tabMaintenance: "Manutencoes",
     tabInventory: "Inventario",
+    tabSupplies: "Insumos",
     tabGroups: "Grupos",
     tabHidden: "Ocultos",
     tabConfig: "Configuracao",
@@ -792,12 +860,32 @@ const i18n = {
     btnOpenChecklist: "Abrir checklist (somente total)",
     btnSaveMaintenance: "Salvar manutencao",
     sectionInventoryTitle: "Inventario de PCs",
+    sectionSuppliesTitle: "Insumos",
+    labelSupplyName: "Nome",
+    labelSupplyQty: "Quantidade",
+    labelSupplyAlert: "Alerta a partir de",
+    labelSupplyLink: "Link de compra (opcional)",
+    placeholderSupplyLink: "https://...",
+    btnSaveSupply: "Salvar insumo",
     searchPlaceholder: "Buscar por usuario, PC ou IP...",
     tableIP: "IP",
     tableEstado: "Status",
     tableGrupo: "Grupo",
     tableUltimo: "Ultima manutencao",
     tableProximo: "Proximo",
+    tableSupplyName: "Insumo",
+    tableSupplyQty: "Quantidade",
+    tableSupplyAlert: "Alerta",
+    tableSupplyStatus: "Status",
+    tableSupplyLink: "Link",
+    tableSupplyActions: "Acoes",
+    linkOpen: "Comprar",
+    statusSupplyOk: "OK",
+    statusSupplyLow: "Baixo estoque",
+    placeholderSupplyDiscount: "Quantidade",
+    btnApplyDiscount: "Descontar",
+    btnDeleteSupply: "Excluir",
+    emptySupplies: "Nenhum insumo cadastrado.",
     sectionGroupsTitle: "Grupos de PCs",
     sectionGroupCreateTitle: "Criar / editar grupo",
     labelNombre: "Nome",
@@ -922,6 +1010,7 @@ const i18n = {
     confirmDeleteGroup: "Excluir o grupo '{name}'? Os PCs irao para {defaultGroup}.",
     confirmDeletePc: "Excluir o PC '{equipo}' de {usuario}? O historico sera removido.",
     confirmDeleteHidden: "Excluir esta manutencao oculta definitivamente?",
+    confirmDeleteSupply: "Excluir o insumo '{name}'?",
     updateAvailableTitle: "Atualizacao disponivel",
     updateAvailableMessage:
       "Uma nova versao esta disponivel ({version}). Baixar agora? (A atualizacao nao apaga os dados)",
@@ -942,6 +1031,10 @@ const i18n = {
     toastMaintenanceSaved: "Manutencao salva.",
     toastMaintenanceUpdated: "Manutencao atualizada.",
     toastMaintenanceDeleted: "Manutencao excluida.",
+    toastSupplyAdded: "Insumo salvo.",
+    toastSupplyDeleted: "Insumo excluido.",
+    toastSupplyDiscounted: "Estoque atualizado.",
+    toastSuppliesImported: "Insumos importados: {count}.",
     toastPcDeleted: "PC excluido.",
     toastChecklistRequired: "Complete o checklist antes de salvar.",
     toastHiddenRemoved: "Manutencoes ocultas removidas.",
@@ -950,6 +1043,8 @@ const i18n = {
     alertNoMaintenance: "Este PC nao tem manutencao registrada.",
     alertNotTotal: "A manutencao nao foi total.",
     alertNotTotalLast: "A ultima manutencao nao foi total.",
+    alertSupplyInvalidDiscount: "Informe uma quantidade valida para descontar.",
+    alertSupplyRequired: "Preencha os campos obrigatorios do insumo.",
     alertAttachmentsRead: "Nao foi possivel ler os anexos.",
     alertImportJson: "Nao foi possivel importar o JSON. Verifique o formato.",
     alertImportSpreadsheet: "Nao foi possivel importar o arquivo. Verifique o formato.",
@@ -959,6 +1054,8 @@ const i18n = {
     exportJsonFilename: "repar-ando-dados.json",
     exportCsvFilename: "repar-ando-inventario.csv",
     exportExcelFilename: "repar-ando-inventario.xlsx",
+    exportSuppliesExcelFilename: "repar-ando-insumos.xlsx",
+    suppliesSheetName: "Insumos",
     csvUsuario: "usuario",
     csvEquipo: "pc",
     csvIp: "ip",
@@ -1042,6 +1139,12 @@ const maintenanceForm = document.getElementById("maintenanceForm");
 const maintenanceUserSelect = document.getElementById(
   "maintenanceUserSelect"
 );
+const supplyForm = document.getElementById("supplyForm");
+const supplyNameInput = document.getElementById("supplyNameInput");
+const supplyQtyInput = document.getElementById("supplyQtyInput");
+const supplyAlertInput = document.getElementById("supplyAlertInput");
+const supplyLinkInput = document.getElementById("supplyLinkInput");
+const suppliesTableBody = document.getElementById("suppliesTableBody");
 const clearFiltersBtn = document.getElementById("clearFiltersBtn");
 const searchInput = document.getElementById("searchInput");
 const historyFromInput = document.getElementById("historyFromInput");
@@ -1102,6 +1205,11 @@ const importJsonOption = document.getElementById("importJsonOption");
 const importCsvOption = document.getElementById("importCsvOption");
 const importExcelOption = document.getElementById("importExcelOption");
 const importCloseBtn = document.getElementById("importCloseBtn");
+const exportSuppliesExcelBtn = document.getElementById("exportSuppliesExcelBtn");
+const importSuppliesExcelBtn = document.getElementById("importSuppliesExcelBtn");
+const importSuppliesExcelInput = document.getElementById(
+  "importSuppliesExcelInput"
+);
 
 const addPcBtn = document.getElementById("addPcBtn");
 const importJsonInput = document.getElementById("importJsonInput");
@@ -1213,6 +1321,39 @@ function normalizeData() {
     }
     group.intervalMonths = Math.max(1, Number(group.intervalMonths));
     group.alertDays = Math.max(0, Number(group.alertDays));
+  });
+
+  if (!Array.isArray(state.data.supplies)) {
+    state.data.supplies = [];
+    changed = true;
+  }
+
+  state.data.supplies.forEach((supply) => {
+    if (!supply.id) {
+      supply.id = crypto.randomUUID();
+      changed = true;
+    }
+    if (typeof supply.name !== "string") {
+      supply.name = "";
+      changed = true;
+    }
+    if (!Number.isFinite(Number(supply.quantity))) {
+      supply.quantity = 0;
+      changed = true;
+    }
+    if (!Number.isFinite(Number(supply.alertThreshold))) {
+      supply.alertThreshold = 0;
+      changed = true;
+    }
+    if (typeof supply.link !== "string") {
+      supply.link = "";
+      changed = true;
+    }
+    supply.quantity = Math.max(0, Math.floor(Number(supply.quantity)));
+    supply.alertThreshold = Math.max(
+      0,
+      Math.floor(Number(supply.alertThreshold))
+    );
   });
 
   state.data.pcs.forEach((pc) => {
@@ -1860,6 +2001,66 @@ function renderTable() {
   });
 }
 
+function renderSupplies() {
+  if (!suppliesTableBody) return;
+  suppliesTableBody.innerHTML = "";
+  const supplies = state.data.supplies || [];
+  if (!supplies.length) {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td colspan="6">${t("emptySupplies")}</td>`;
+    suppliesTableBody.appendChild(row);
+    return;
+  }
+
+  supplies.forEach((supply) => {
+    const isLow = supply.quantity <= supply.alertThreshold;
+    const statusLabel = isLow ? t("statusSupplyLow") : t("statusSupplyOk");
+    const statusClass = isLow ? "badge due" : "badge ok";
+    const linkHtml = supply.link
+      ? `<a href="${supply.link}" data-external-link>${t("linkOpen")}</a>`
+      : "-";
+    const row = document.createElement("tr");
+    if (isLow) row.classList.add("row-low-stock");
+    row.innerHTML = `
+      <td>${supply.name}</td>
+      <td>${supply.quantity}</td>
+      <td>${supply.alertThreshold}</td>
+      <td><span class="${statusClass}">${statusLabel}</span></td>
+      <td>${linkHtml}</td>
+      <td>
+        <div class="supply-actions">
+          <input
+            class="supply-discount-input"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="${t("placeholderSupplyDiscount")}"
+            data-discount-input="true"
+          />
+          <button class="btn ghost btn-small" data-action="discount-supply" data-id="${supply.id}">
+            ${t("btnApplyDiscount")}
+          </button>
+          <button class="btn danger btn-small" data-action="delete-supply" data-id="${supply.id}">
+            ${t("btnDeleteSupply")}
+          </button>
+        </div>
+      </td>
+    `;
+    suppliesTableBody.appendChild(row);
+  });
+
+  if (window.externalLinks) {
+    suppliesTableBody.querySelectorAll("[data-external-link]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const url = link.getAttribute("href");
+        if (!url) return;
+        event.preventDefault();
+        window.externalLinks.open(url);
+      });
+    });
+  }
+}
+
 function renderMaintenanceHistory() {
   maintenanceTableBody.innerHTML = "";
   const rows = [];
@@ -2125,10 +2326,12 @@ function openChecklist(pcId) {
   checklistDialog.showModal();
 }
 
-function closeChecklist() {
+function closeChecklist(resetDraft = true) {
   checklistDialog.close();
   state.checklistPcId = null;
-  state.checklistDraft = {};
+  if (resetDraft) {
+    state.checklistDraft = {};
+  }
 }
 
 function openChecklistView(pcId, recordId = null) {
@@ -2202,6 +2405,13 @@ function buildChecklistPayload() {
 function checklistHasSelection() {
   if (!state.checklistDraft) return false;
   return Object.values(state.checklistDraft).some(Boolean);
+}
+
+function normalizeSupplyLink(value) {
+  const link = String(value || "").trim();
+  if (!link) return "";
+  if (/^https?:\/\//i.test(link)) return link;
+  return `https://${link}`;
 }
 
 function readAttachments(fileList) {
@@ -2294,6 +2504,68 @@ async function handleMaintenanceSubmit(event) {
     state.editingRecord ? t("toastMaintenanceUpdated") : t("toastMaintenanceSaved")
   );
   state.editingRecord = null;
+}
+
+function handleSupplySubmit(event) {
+  event.preventDefault();
+  const name = (supplyNameInput?.value || "").trim();
+  const quantity = Number(supplyQtyInput?.value);
+  const alertThreshold = Number(supplyAlertInput?.value);
+  if (!name || !Number.isFinite(quantity) || !Number.isFinite(alertThreshold)) {
+    alert(t("alertSupplyRequired"));
+    return;
+  }
+  const supply = {
+    id: crypto.randomUUID(),
+    name,
+    quantity: Math.max(0, Math.floor(quantity)),
+    alertThreshold: Math.max(0, Math.floor(alertThreshold)),
+    link: normalizeSupplyLink(supplyLinkInput?.value),
+  };
+  state.data.supplies.push(supply);
+  saveData();
+  renderSupplies();
+  showToast(t("toastSupplyAdded"));
+  if (supplyForm) supplyForm.reset();
+}
+
+async function handleSupplyTableClick(event) {
+  const button = event.target.closest("button");
+  if (!button) return;
+  const action = button.dataset.action;
+  const id = button.dataset.id;
+  if (!action || !id) return;
+  const supply = state.data.supplies.find((item) => item.id === id);
+  if (!supply) return;
+
+  if (action === "discount-supply") {
+    const row = button.closest("tr");
+    const input = row?.querySelector("[data-discount-input]");
+    const amount = Number(input?.value);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert(t("alertSupplyInvalidDiscount"));
+      return;
+    }
+    supply.quantity = Math.max(0, supply.quantity - Math.floor(amount));
+    saveData();
+    renderSupplies();
+    showToast(t("toastSupplyDiscounted"));
+    return;
+  }
+
+  if (action === "delete-supply") {
+    const confirmed = await openConfirmDialog({
+      title: t("confirmTitle"),
+      message: t("confirmDeleteSupply", { name: supply.name }),
+      confirmLabel: t("actionDelete"),
+      confirmStyle: "danger",
+    });
+    if (!confirmed) return;
+    state.data.supplies = state.data.supplies.filter((item) => item.id !== id);
+    saveData();
+    renderSupplies();
+    showToast(t("toastSupplyDeleted"));
+  }
 }
 
 function handlePcSubmit(event) {
@@ -2639,6 +2911,33 @@ function exportExcel() {
   downloadBlob(blob, t("exportExcelFilename"));
 }
 
+function exportSuppliesExcel() {
+  if (typeof XLSX === "undefined" || !XLSX?.utils) {
+    alert(t("alertExportSpreadsheet"));
+    return;
+  }
+  const headers = [
+    t("tableSupplyName"),
+    t("tableSupplyQty"),
+    t("tableSupplyAlert"),
+    t("tableSupplyLink"),
+  ];
+  const rows = (state.data.supplies || []).map((supply) => [
+    supply.name,
+    supply.quantity,
+    supply.alertThreshold,
+    supply.link || "",
+  ]);
+  const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, t("suppliesSheetName"));
+  const output = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const blob = new Blob([output], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  downloadBlob(blob, t("exportSuppliesExcelFilename"));
+}
+
 function escapeCsv(value) {
   const text = String(value ?? "");
   if (text.includes(",") || text.includes('"') || text.includes("\n")) {
@@ -2711,6 +3010,83 @@ function importExcelFile(file) {
         defval: "",
       });
       importRows(rows);
+    } catch {
+      alert(t("alertImportSpreadsheet"));
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function normalizeHeader(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function resolveSupplyColumnMap(headerRow) {
+  const nameKeys = ["insumo", "nombre", "name", "item", "producto"];
+  const qtyKeys = ["cantidad", "qty", "quantity", "stock"];
+  const alertKeys = ["alerta", "alertadesde", "alert", "min", "umbral", "threshold"];
+  const linkKeys = ["link", "url", "enlace", "compra"];
+  const map = { name: null, qty: null, alert: null, link: null };
+  headerRow.forEach((cell, index) => {
+    const key = normalizeHeader(cell);
+    if (!key) return;
+    if (map.name === null && nameKeys.includes(key)) map.name = index;
+    if (map.qty === null && qtyKeys.includes(key)) map.qty = index;
+    if (map.alert === null && alertKeys.includes(key)) map.alert = index;
+    if (map.link === null && linkKeys.includes(key)) map.link = index;
+  });
+  return map;
+}
+
+function importSuppliesExcel(file) {
+  if (typeof XLSX === "undefined" || !XLSX?.read) {
+    alert(t("alertImportSpreadsheet"));
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = new Uint8Array(reader.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = sheetName ? workbook.Sheets[sheetName] : null;
+      if (!sheet) throw new Error("Sheet not found");
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+      if (!rows.length) return;
+      const headerRow = rows[0] || [];
+      const map = resolveSupplyColumnMap(headerRow);
+      const useFallback =
+        map.name === null || map.qty === null || map.alert === null;
+      let imported = 0;
+      rows.slice(1).forEach((row) => {
+        const name = useFallback ? row[0] : row[map.name];
+        const qty = useFallback ? row[1] : row[map.qty];
+        const alert = useFallback ? row[2] : row[map.alert];
+        const link = useFallback ? row[3] : row[map.link];
+        const trimmedName = String(name || "").trim();
+        const quantity = Number(qty);
+        const alertThreshold = Number(alert);
+        if (!trimmedName) return;
+        if (!Number.isFinite(quantity) || !Number.isFinite(alertThreshold)) return;
+        state.data.supplies.push({
+          id: crypto.randomUUID(),
+          name: trimmedName,
+          quantity: Math.max(0, Math.floor(quantity)),
+          alertThreshold: Math.max(0, Math.floor(alertThreshold)),
+          link: normalizeSupplyLink(link),
+        });
+        imported += 1;
+      });
+      saveData();
+      renderSupplies();
+      if (imported) {
+        showToast(t("toastSuppliesImported", { count: imported }));
+      }
     } catch {
       alert(t("alertImportSpreadsheet"));
     }
@@ -2968,6 +3344,7 @@ function renderAll() {
   renderPcSelect();
   renderUserSuggestions();
   renderTable();
+  renderSupplies();
   renderMaintenanceHistory();
   renderHiddenMaintenanceHistory();
   maybeNotify(items);
@@ -2989,6 +3366,7 @@ function setActiveTab(tabId) {
       alertas: t("tabAlerts"),
       mantenimientos: t("tabMaintenance"),
       inventario: t("tabInventory"),
+      insumos: t("tabSupplies"),
       grupos: t("tabGroups"),
       configuracion: t("tabConfig"),
       ocultos: t("tabHidden"),
@@ -3060,6 +3438,12 @@ groupForm.addEventListener("submit", handleGroupSubmit);
 groupCancelBtn.addEventListener("click", resetGroupForm);
 groupTableBody.addEventListener("click", handleGroupTableClick);
 groupAssignTableBody.addEventListener("change", handleGroupAssignChange);
+if (supplyForm) {
+  supplyForm.addEventListener("submit", handleSupplySubmit);
+}
+if (suppliesTableBody) {
+  suppliesTableBody.addEventListener("click", handleSupplyTableClick);
+}
 tabButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     setActiveTab(btn.dataset.tab);
@@ -3301,6 +3685,26 @@ if (exportAllBtn) {
   });
 }
 
+if (exportSuppliesExcelBtn) {
+  exportSuppliesExcelBtn.addEventListener("click", () => {
+    exportSuppliesExcel();
+  });
+}
+
+if (importSuppliesExcelBtn) {
+  importSuppliesExcelBtn.addEventListener("click", () => {
+    if (importSuppliesExcelInput) importSuppliesExcelInput.click();
+  });
+}
+
+if (importSuppliesExcelInput) {
+  importSuppliesExcelInput.addEventListener("change", (event) => {
+    const file = event.target.files?.[0];
+    if (file) importSuppliesExcel(file);
+    event.target.value = "";
+  });
+}
+
 if (darkModeSwitch) {
   darkModeSwitch.checked = settings.darkMode;
   darkModeSwitch.addEventListener("change", () => {
@@ -3354,7 +3758,7 @@ openChecklistBtn.addEventListener("click", () => {
 checklistForm.addEventListener("submit", (event) => {
   event.preventDefault();
   state.checklistDraft = buildChecklistPayload();
-  closeChecklist();
+  closeChecklist(false);
 });
 
 checklistCancelBtn.addEventListener("click", closeChecklist);

@@ -2419,7 +2419,9 @@ function parseLooseNumber(value) {
   if (value === null || value === undefined) return NaN;
   let text = String(value).trim();
   if (!text) return NaN;
-  text = text.replace(/\s/g, "");
+  const match = text.match(/-?\d+(?:[.,]\d+)?/);
+  if (!match) return NaN;
+  text = match[0];
   const hasComma = text.includes(",");
   const hasDot = text.includes(".");
   if (hasComma && hasDot) {
@@ -3043,9 +3045,26 @@ function normalizeHeader(value) {
 }
 
 function resolveSupplyColumnMap(headerRow) {
-  const nameKeys = ["insumo", "nombre", "name", "item", "producto"];
-  const qtyKeys = ["cantidad", "qty", "quantity", "stock"];
-  const alertKeys = ["alerta", "alertadesde", "alert", "min", "umbral", "threshold"];
+  const nameKeys = ["insumo", "nombre", "name", "item", "producto", "articulo"];
+  const qtyKeys = [
+    "cantidad",
+    "qty",
+    "quantity",
+    "stock",
+    "existencias",
+    "stockactual",
+  ];
+  const alertKeys = [
+    "alerta",
+    "alertadesde",
+    "alert",
+    "min",
+    "minimo",
+    "minimos",
+    "stockminimo",
+    "umbral",
+    "threshold",
+  ];
   const linkKeys = ["link", "url", "enlace", "compra"];
   const map = { name: null, qty: null, alert: null, link: null };
   headerRow.forEach((cell, index) => {

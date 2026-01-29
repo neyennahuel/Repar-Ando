@@ -2280,7 +2280,7 @@ function renderChecklist(checklistData = {}) {
 
     group.items.forEach((item) => {
       const label = document.createElement("label");
-      label.className = "checklist-item";
+      label.className = "checklist-item checklist-edit-item";
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.name = item.id;
@@ -2299,18 +2299,25 @@ function renderChecklist(checklistData = {}) {
 function renderChecklistView(checklistData = {}) {
   checklistViewContainer.innerHTML = "";
   getChecklistTemplate().forEach((group) => {
-    const itemsDone = group.items.filter((item) => checklistData[item.id]);
-    if (!itemsDone.length) return;
     const groupEl = document.createElement("div");
     groupEl.className = "checklist-group";
     const title = document.createElement("h4");
     title.textContent = group.title;
     groupEl.appendChild(title);
 
-    itemsDone.forEach((item) => {
+    group.items.forEach((item) => {
+      const checked = Boolean(checklistData[item.id]);
       const row = document.createElement("div");
-      row.className = "checklist-item";
-      row.textContent = item.label;
+      row.className = "checklist-item checklist-view-item";
+      const indicator = document.createElement("span");
+      indicator.className = `checklist-indicator ${
+        checked ? "checked" : "unchecked"
+      }`;
+      indicator.textContent = checked ? "✓" : "○";
+      const text = document.createElement("span");
+      text.textContent = item.label;
+      row.appendChild(indicator);
+      row.appendChild(text);
       groupEl.appendChild(row);
     });
 

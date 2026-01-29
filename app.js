@@ -1095,6 +1095,7 @@ const state = {
   checklistDraft: {},
   checklistPcId: null,
   editingRecord: null,
+  editingSupplyId: null,
 };
 
 const settings = loadSettings();
@@ -2037,6 +2038,9 @@ function renderSupplies() {
             placeholder="${t("placeholderSupplyDiscount")}"
             data-discount-input="true"
           />
+          <button class="btn ghost btn-small" data-action="edit-supply" data-id="${supply.id}">
+            ${t("actionEdit")}
+          </button>
           <button class="btn ghost btn-small" data-action="discount-supply" data-id="${supply.id}">
             ${t("btnApplyDiscount")}
           </button>
@@ -2529,22 +2533,41 @@ function handleSupplySubmit(event) {
   const name = (supplyNameInput?.value || "").trim();
   const quantity = parseLooseNumber(supplyQtyInput?.value);
   const alertThreshold = parseLooseNumber(supplyAlertInput?.value);
-  if (!name || !Number.isFinite(quantity) || !Number.isFinite(alertThreshold)) {
+  if (!name) {
     alert(t("alertSupplyRequired"));
     return;
   }
-  const supply = {
-    id: crypto.randomUUID(),
-    name,
-    quantity: Math.max(0, Math.floor(quantity)),
-    alertThreshold: Math.max(0, Math.floor(alertThreshold)),
-    link: normalizeSupplyLink(supplyLinkInput?.value),
-  };
-  state.data.supplies.push(supply);
+  const normalizedQty = Number.isFinite(quantity)
+    ? Math.max(0, Math.floor(quantity))
+    : 0;
+  const normalizedAlert = Number.isFinite(alertThreshold)
+    ? Math.max(0, Math.floor(alertThreshold))
+    : 0;
+  if (state.editingSupplyId) {
+    const supply = state.data.supplies.find(
+      (item) => item.id === state.editingSupplyId
+    );
+    if (supply) {
+      supply.name = name;
+      supply.quantity = normalizedQty;
+      supply.alertThreshold = normalizedAlert;
+      supply.link = normalizeSupplyLink(supplyLinkInput?.value);
+    }
+  } else {
+    const supply = {
+      id: crypto.randomUUID(),
+      name,
+      quantity: normalizedQty,
+      alertThreshold: normalizedAlert,
+      link: normalizeSupplyLink(supplyLinkInput?.value),
+    };
+    state.data.supplies.push(supply);
+  }
   saveData();
   renderSupplies();
   showToast(t("toastSupplyAdded"));
   if (supplyForm) supplyForm.reset();
+  state.editingSupplyId = null;
 }
 
 async function handleSupplyTableClick(event) {
@@ -2571,6 +2594,20 @@ async function handleSupplyTableClick(event) {
     return;
   }
 
+  if (action === "edit-supply") {
+    state.editingSupplyId = id;
+    supplyNameInput.value = supply.name || "";
+    supplyQtyInput.value =
+      supply.quantity || supply.quantity === 0 ? supply.quantity : "";
+    supplyAlertInput.value =
+      supply.alertThreshold || supply.alertThreshold === 0
+        ? supply.alertThreshold
+        : "";
+    supplyLinkInput.value = supply.link || "";
+    supplyNameInput.focus();
+    return;
+  }
+
   if (action === "delete-supply") {
     const confirmed = await openConfirmDialog({
       title: t("confirmTitle"),
@@ -2580,6 +2617,10 @@ async function handleSupplyTableClick(event) {
     });
     if (!confirmed) return;
     state.data.supplies = state.data.supplies.filter((item) => item.id !== id);
+    if (state.editingSupplyId === id) {
+      state.editingSupplyId = null;
+      if (supplyForm) supplyForm.reset();
+    }
     saveData();
     renderSupplies();
     showToast(t("toastSupplyDeleted"));
@@ -3107,12 +3148,15 @@ function importSuppliesExcel(file) {
         const quantity = parseLooseNumber(qty);
         const alertThreshold = parseLooseNumber(alert);
         if (!trimmedName) return;
-        if (!Number.isFinite(quantity) || !Number.isFinite(alertThreshold)) return;
         state.data.supplies.push({
           id: crypto.randomUUID(),
           name: trimmedName,
-          quantity: Math.max(0, Math.floor(quantity)),
-          alertThreshold: Math.max(0, Math.floor(alertThreshold)),
+          quantity: Number.isFinite(quantity)
+            ? Math.max(0, Math.floor(quantity))
+            : 0,
+          alertThreshold: Number.isFinite(alertThreshold)
+            ? Math.max(0, Math.floor(alertThreshold))
+            : 0,
           link: normalizeSupplyLink(link),
         });
         imported += 1;

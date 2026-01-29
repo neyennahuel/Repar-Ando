@@ -310,6 +310,9 @@ const i18n = {
     chartTitle: "Mantenimientos por mes",
     chartNote: "Ultimos 12 meses",
     chartAria: "Grafico de mantenimientos por mes",
+    chartDailyTitle: "Mantenimientos por dia",
+    chartDailyNote: "Todos los registros",
+    chartDailyAria: "Grafico de mantenimientos por dia",
     sectionHistoryTitle: "Historial de mantenimientos",
     labelFrom: "Desde",
     labelTo: "Hasta",
@@ -367,6 +370,8 @@ const i18n = {
     labelNombre: "Nombre",
     labelCadaMeses: "Cada (meses)",
     labelAvisoDias: "Aviso (dias)",
+    labelGroupFilter: "Grupo",
+    labelGroupFilter: "Grupo",
     monthsUnit: "meses",
     daysUnit: "dias",
     btnCancel: "Cancelar",
@@ -375,6 +380,7 @@ const i18n = {
     tableAviso: "Aviso",
     tableEquipos: "Equipos",
     sectionGroupAssignTitle: "Asignacion de grupos",
+    groupAssignSearchPlaceholder: "Buscar por usuario o equipo...",
     sectionConfigTitle: "Configuracion",
     sectionAlertsNextTitle: "Alertas y proximos",
     switchShowNextLabel: "Mostrar cartel Proximo",
@@ -574,6 +580,9 @@ const i18n = {
     chartTitle: "Maintenance per month",
     chartNote: "Last 12 months",
     chartAria: "Maintenance per month chart",
+    chartDailyTitle: "Maintenance per day",
+    chartDailyNote: "All records",
+    chartDailyAria: "Maintenance per day chart",
     sectionHistoryTitle: "Maintenance history",
     labelFrom: "From",
     labelTo: "To",
@@ -630,6 +639,7 @@ const i18n = {
     labelNombre: "Name",
     labelCadaMeses: "Every (months)",
     labelAvisoDias: "Alert (days)",
+    labelGroupFilter: "Group",
     monthsUnit: "months",
     daysUnit: "days",
     btnCancel: "Cancel",
@@ -638,6 +648,7 @@ const i18n = {
     tableAviso: "Alert",
     tableEquipos: "PCs",
     sectionGroupAssignTitle: "Group assignment",
+    groupAssignSearchPlaceholder: "Search by user or PC...",
     sectionConfigTitle: "Settings",
     sectionAlertsNextTitle: "Alerts and next",
     switchShowNextLabel: "Show Next label",
@@ -836,6 +847,9 @@ const i18n = {
     chartTitle: "Manutencoes por mes",
     chartNote: "Ultimos 12 meses",
     chartAria: "Grafico de manutencoes por mes",
+    chartDailyTitle: "Manutencoes por dia",
+    chartDailyNote: "Todos os registros",
+    chartDailyAria: "Grafico de manutencoes por dia",
     sectionHistoryTitle: "Historico de manutencoes",
     labelFrom: "De",
     labelTo: "Ate",
@@ -899,6 +913,7 @@ const i18n = {
     tableAviso: "Aviso",
     tableEquipos: "PCs",
     sectionGroupAssignTitle: "Atribuicao de grupos",
+    groupAssignSearchPlaceholder: "Buscar por usuario o PC...",
     sectionConfigTitle: "Configuracao",
     sectionAlertsNextTitle: "Alertas e proximo",
     switchShowNextLabel: "Mostrar linha Proximo",
@@ -1108,6 +1123,10 @@ const maintenanceChart = document.getElementById("maintenanceChart");
 const maintenanceChartLegend = document.getElementById(
   "maintenanceChartLegend"
 );
+const maintenanceDailyChart = document.getElementById("maintenanceDailyChart");
+const maintenanceDailyChartLegend = document.getElementById(
+  "maintenanceDailyChartLegend"
+);
 const startNextSwitch = document.getElementById("startNextSwitch");
 const languageSelect = document.getElementById("languageSelect");
 const notificationsSwitch = document.getElementById("notificationsSwitch");
@@ -1161,6 +1180,12 @@ const groupCancelBtn = document.getElementById("groupCancelBtn");
 const groupTableBody = document.getElementById("groupTableBody");
 const groupAssignTableBody = document.getElementById(
   "groupAssignTableBody"
+);
+const groupAssignSearchInput = document.getElementById(
+  "groupAssignSearchInput"
+);
+const groupAssignFilterSelect = document.getElementById(
+  "groupAssignFilterSelect"
 );
 
 const pcDialog = document.getElementById("pcDialog");
@@ -1666,21 +1691,44 @@ function buildMonthlyMaintenanceSeries(months = 12) {
   }));
 }
 
-function renderMaintenanceChart(series) {
-  if (!maintenanceChart || !maintenanceChartLegend) return;
+function buildDailyMaintenanceSeries() {
+  const series = [];
+  const counts = new Map();
+  for (let day = 1; day <= 31; day += 1) {
+    const key = String(day);
+    counts.set(key, 0);
+    series.push({ key, label: String(day), count: 0 });
+  }
+  state.data.pcs.forEach((pc) => {
+    (pc.maintenanceHistory || []).forEach((record) => {
+      if (record.hidden) return;
+      const date = new Date(record.date);
+      if (Number.isNaN(date.getTime())) return;
+      const key = String(date.getDate());
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+  });
+  return series.map((item) => ({
+    ...item,
+    count: counts.get(item.key) || 0,
+  }));
+}
+
+function renderMaintenanceChartFor(canvas, legend, series) {
+  if (!canvas || !legend) return;
   const total = series.reduce((sum, item) => sum + item.count, 0);
-  maintenanceChartLegend.innerHTML = total
+  legend.innerHTML = total
     ? `<span><span class="dot"></span>${t("chartTotal")}: ${total}</span>`
     : `<span>${t("chartNoData")}</span>`;
 
-  const ctx = maintenanceChart.getContext("2d");
+  const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  const width = maintenanceChart.clientWidth || 800;
-  const height = maintenanceChart.clientHeight || 240;
+  const width = canvas.clientWidth || 800;
+  const height = canvas.clientHeight || 240;
   const dpr = window.devicePixelRatio || 1;
-  maintenanceChart.width = Math.round(width * dpr);
-  maintenanceChart.height = Math.round(height * dpr);
+  canvas.width = Math.round(width * dpr);
+  canvas.height = Math.round(height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
 
@@ -1733,6 +1781,18 @@ function renderMaintenanceChart(series) {
     ctx.fillStyle = "rgba(92, 79, 66, 0.85)";
     ctx.fillText(item.label, x + barWidth / 2, padding.top + chartHeight + 6);
   });
+}
+
+function renderMaintenanceChart(series) {
+  renderMaintenanceChartFor(maintenanceChart, maintenanceChartLegend, series);
+}
+
+function renderDailyMaintenanceChart(series) {
+  renderMaintenanceChartFor(
+    maintenanceDailyChart,
+    maintenanceDailyChartLegend,
+    series
+  );
 }
 
 function renderSummary() {
@@ -1812,6 +1872,8 @@ function renderSummary() {
 
   const monthlySeries = buildMonthlyMaintenanceSeries(12);
   requestAnimationFrame(() => renderMaintenanceChart(monthlySeries));
+  const dailySeries = buildDailyMaintenanceSeries();
+  requestAnimationFrame(() => renderDailyMaintenanceChart(dailySeries));
 }
 
 function renderGroupSelectOptions(selectedId = null) {
@@ -1822,6 +1884,23 @@ function renderGroupSelectOptions(selectedId = null) {
     .join("");
   pcGroupSelect.innerHTML = options;
   pcGroupSelect.value = currentValue;
+}
+
+function renderGroupAssignFilterOptions() {
+  if (!groupAssignFilterSelect) return;
+  const currentValue = groupAssignFilterSelect.value || "";
+  groupAssignFilterSelect.innerHTML = "";
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = t("optionAll");
+  groupAssignFilterSelect.appendChild(allOption);
+  state.data.groups.forEach((group) => {
+    const option = document.createElement("option");
+    option.value = group.id;
+    option.textContent = getGroupLabel(group);
+    groupAssignFilterSelect.appendChild(option);
+  });
+  groupAssignFilterSelect.value = currentValue;
 }
 
 function renderGroups() {
@@ -1857,7 +1936,19 @@ function renderGroups() {
 function renderGroupAssignments() {
   if (!groupAssignTableBody) return;
   groupAssignTableBody.innerHTML = "";
-  if (!state.data.pcs.length) {
+  const query = (groupAssignSearchInput?.value || "").toLowerCase();
+  const filterGroupId = groupAssignFilterSelect?.value || "";
+  const pcs = state.data.pcs.filter((pc) => {
+    const matchesQuery =
+      !query ||
+      pc.usuario.toLowerCase().includes(query) ||
+      pc.equipo.toLowerCase().includes(query);
+    const groupId = pc.groupId || DEFAULT_GROUP_ID;
+    const matchesGroup = !filterGroupId || groupId === filterGroupId;
+    return matchesQuery && matchesGroup;
+  });
+
+  if (!pcs.length) {
     const row = document.createElement("tr");
     row.innerHTML = `<td colspan="3">${t("noGroups")}</td>`;
     groupAssignTableBody.appendChild(row);
@@ -1865,10 +1956,13 @@ function renderGroupAssignments() {
   }
 
   const options = state.data.groups
-    .map((group) => `<option value="${group.id}">${getGroupLabel(group)}</option>`)
+    .map(
+      (group) =>
+        `<option value="${group.id}">${getGroupLabel(group)}</option>`
+    )
     .join("");
 
-  state.data.pcs.forEach((pc) => {
+  pcs.forEach((pc) => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${pc.usuario}</td>
@@ -3426,6 +3520,7 @@ function renderAll() {
   renderSummary();
   renderGroups();
   renderGroupAssignments();
+  renderGroupAssignFilterOptions();
   renderGroupSelectOptions();
   renderPcSelect();
   renderUserSuggestions();
@@ -3524,6 +3619,12 @@ groupForm.addEventListener("submit", handleGroupSubmit);
 groupCancelBtn.addEventListener("click", resetGroupForm);
 groupTableBody.addEventListener("click", handleGroupTableClick);
 groupAssignTableBody.addEventListener("change", handleGroupAssignChange);
+if (groupAssignSearchInput) {
+  groupAssignSearchInput.addEventListener("input", renderGroupAssignments);
+}
+if (groupAssignFilterSelect) {
+  groupAssignFilterSelect.addEventListener("change", renderGroupAssignments);
+}
 if (supplyForm) {
   supplyForm.addEventListener("submit", handleSupplySubmit);
 }

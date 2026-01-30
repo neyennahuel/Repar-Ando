@@ -82,13 +82,6 @@
         </button>
       </div>
 
-      <section class="panel tab-panel active" data-tab="alertas">
-        <div class="panel-header">
-          <h2 data-i18n="sectionAlertsTitle">Alertas de mantenimiento</h2>
-        </div>
-        <div class="alert-grid" id="alertGrid"></div>
-      </section>
-
       <section class="panel tab-panel" data-tab="alertas">
         <div class="panel-header">
           <h2 data-i18n="sectionSummaryTitle">Resumen</h2>
@@ -112,44 +105,11 @@
         </div>
       </section>
 
-      <section class="panel tab-panel" data-tab="mantenimientos">
+      <section class="panel tab-panel active" data-tab="alertas">
         <div class="panel-header">
-          <h2 data-i18n="sectionHistoryTitle">Historial de mantenimientos</h2>
-          <div class="panel-controls">
-            <label class="field-inline">
-              <span data-i18n="labelFrom">Desde</span>
-              <input id="historyFromInput" type="date" />
-            </label>
-            <label class="field-inline">
-              <span data-i18n="labelTo">Hasta</span>
-              <input id="historyToInput" type="date" />
-            </label>
-            <label class="field-inline">
-              <span data-i18n="labelType">Tipo</span>
-              <select id="historyTypeSelect">
-                <option value="" data-i18n="optionAll">Todos</option>
-                <option value="total" data-i18n="optionTotal">Total</option>
-                <option value="limpieza" data-i18n="optionCleaning">Limpieza</option>
-              </select>
-            </label>
-          </div>
+          <h2 data-i18n="sectionAlertsTitle">Alertas de mantenimiento</h2>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th data-i18n="tableDate">Fecha</th>
-                <th data-i18n="tableEquipo">Equipo</th>
-                <th data-i18n="tableUsuario">Usuario</th>
-                <th data-i18n="tableTipo">Tipo</th>
-                <th data-i18n="tableTecnico">Tecnico</th>
-                <th data-i18n="tableNotas">Notas</th>
-                <th data-i18n="tableAcciones">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="maintenanceTableBody"></tbody>
-          </table>
-        </div>
+        <div class="alert-grid" id="alertGrid"></div>
       </section>
 
       <section class="panel tab-panel" data-tab="mantenimientos">
@@ -202,6 +162,46 @@
             <button type="submit" class="btn primary" data-i18n="btnSaveMaintenance">Guardar mantenimiento</button>
           </div>
         </form>
+      </section>
+
+      <section class="panel tab-panel" data-tab="mantenimientos">
+        <div class="panel-header">
+          <h2 data-i18n="sectionHistoryTitle">Historial de mantenimientos</h2>
+          <div class="panel-controls">
+            <label class="field-inline">
+              <span data-i18n="labelFrom">Desde</span>
+              <input id="historyFromInput" type="date" />
+            </label>
+            <label class="field-inline">
+              <span data-i18n="labelTo">Hasta</span>
+              <input id="historyToInput" type="date" />
+            </label>
+            <label class="field-inline">
+              <span data-i18n="labelType">Tipo</span>
+              <select id="historyTypeSelect">
+                <option value="" data-i18n="optionAll">Todos</option>
+                <option value="total" data-i18n="optionTotal">Total</option>
+                <option value="limpieza" data-i18n="optionCleaning">Limpieza</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="tableDate">Fecha</th>
+                <th data-i18n="tableEquipo">Equipo</th>
+                <th data-i18n="tableUsuario">Usuario</th>
+                <th data-i18n="tableTipo">Tipo</th>
+                <th data-i18n="tableTecnico">Tecnico</th>
+                <th data-i18n="tableNotas">Notas</th>
+                <th data-i18n="tableAcciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="maintenanceTableBody"></tbody>
+          </table>
+        </div>
       </section>
 
       <section class="panel tab-panel" data-tab="inventario">

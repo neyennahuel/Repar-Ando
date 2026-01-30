@@ -363,6 +363,7 @@ const i18n = {
     statusSupplyLow: "Bajo stock",
     placeholderSupplyDiscount: "Cantidad",
     btnApplyDiscount: "Descontar",
+    btnApplyAdd: "Agregar",
     btnDeleteSupply: "Eliminar",
     emptySupplies: "No hay insumos cargados.",
     sectionGroupsTitle: "Grupos de equipos",
@@ -516,6 +517,7 @@ const i18n = {
     toastSupplyAdded: "Insumo guardado.",
     toastSupplyDeleted: "Insumo eliminado.",
     toastSupplyDiscounted: "Descuento aplicado.",
+    toastSupplyAddedQty: "Cantidad agregada.",
     toastSuppliesImported: "Insumos importados: {count}.",
     toastPcDeleted: "PC eliminada.",
     toastChecklistRequired: "Completa el checklist antes de guardar.",
@@ -632,6 +634,7 @@ const i18n = {
     statusSupplyLow: "Low stock",
     placeholderSupplyDiscount: "Amount",
     btnApplyDiscount: "Subtract",
+    btnApplyAdd: "Add",
     btnDeleteSupply: "Delete",
     emptySupplies: "No supplies yet.",
     sectionGroupsTitle: "PC groups",
@@ -784,6 +787,7 @@ const i18n = {
     toastSupplyAdded: "Supply saved.",
     toastSupplyDeleted: "Supply deleted.",
     toastSupplyDiscounted: "Stock updated.",
+    toastSupplyAddedQty: "Quantity added.",
     toastSuppliesImported: "Supplies imported: {count}.",
     toastPcDeleted: "PC deleted.",
     toastChecklistRequired: "Complete the checklist before saving.",
@@ -898,6 +902,7 @@ const i18n = {
     statusSupplyLow: "Baixo estoque",
     placeholderSupplyDiscount: "Quantidade",
     btnApplyDiscount: "Descontar",
+    btnApplyAdd: "Adicionar",
     btnDeleteSupply: "Excluir",
     emptySupplies: "Nenhum insumo cadastrado.",
     sectionGroupsTitle: "Grupos de PCs",
@@ -1049,6 +1054,7 @@ const i18n = {
     toastSupplyAdded: "Insumo salvo.",
     toastSupplyDeleted: "Insumo excluido.",
     toastSupplyDiscounted: "Estoque atualizado.",
+    toastSupplyAddedQty: "Quantidade adicionada.",
     toastSuppliesImported: "Insumos importados: {count}.",
     toastPcDeleted: "PC excluido.",
     toastChecklistRequired: "Complete o checklist antes de salvar.",
@@ -2138,6 +2144,9 @@ function renderSupplies() {
           <button class="btn ghost btn-small" data-action="discount-supply" data-id="${supply.id}">
             ${t("btnApplyDiscount")}
           </button>
+          <button class="btn ghost btn-small" data-action="add-supply" data-id="${supply.id}">
+            ${t("btnApplyAdd")}
+          </button>
           <button class="btn danger btn-small" data-action="delete-supply" data-id="${supply.id}">
             ${t("btnDeleteSupply")}
           </button>
@@ -2482,13 +2491,30 @@ function openAttachments(record) {
       row.className = "attachment-item";
       const name = document.createElement("span");
       name.textContent = file.name || t("attachmentFile");
-      const link = document.createElement("a");
-      link.href = file.data;
-      link.download = file.name || t("attachmentFile");
-      link.className = "btn ghost";
-      link.textContent = t("download");
-      row.appendChild(name);
-      row.appendChild(link);
+      const isImage =
+        (file.type || "").startsWith("image/") ||
+        String(file.data || "").startsWith("data:image/");
+      const actions = document.createElement("div");
+      actions.className = "attachment-actions";
+      const download = document.createElement("a");
+      download.href = file.data;
+      download.download = file.name || t("attachmentFile");
+      download.className = "btn ghost";
+      download.textContent = t("download");
+      if (isImage) {
+        row.classList.add("is-image");
+        const preview = document.createElement("img");
+        preview.className = "attachment-preview";
+        preview.alt = file.name || t("attachmentFile");
+        preview.src = file.data;
+        row.appendChild(name);
+        row.appendChild(preview);
+        actions.appendChild(download);
+        row.appendChild(actions);
+      } else {
+        row.appendChild(name);
+        row.appendChild(download);
+      }
       attachmentsContainer.appendChild(row);
     });
   }
@@ -2692,6 +2718,21 @@ async function handleSupplyTableClick(event) {
     saveData();
     renderSupplies();
     showToast(t("toastSupplyDiscounted"));
+    return;
+  }
+
+  if (action === "add-supply") {
+    const row = button.closest("tr");
+    const input = row?.querySelector("[data-discount-input]");
+    const amount = Number(input?.value);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert(t("alertSupplyInvalidDiscount"));
+      return;
+    }
+    supply.quantity = Math.max(0, supply.quantity + Math.floor(amount));
+    saveData();
+    renderSupplies();
+    showToast(t("toastSupplyAddedQty"));
     return;
   }
 

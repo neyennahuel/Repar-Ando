@@ -1674,6 +1674,7 @@ function renderAlerts() {
   items.forEach(({ pc, dueDate, nextType, status, group }) => {
     const card = document.createElement("div");
     card.className = "alert-card";
+    card.dataset.pcId = pc.id;
     const lastMaintenance = pc.lastMaintenance
       ? `${getMaintenanceTypeLabel(pc.lastMaintenance.type)} - ${formatDate(
           pc.lastMaintenance.date
@@ -3053,13 +3054,25 @@ async function handleMaintenanceHistoryClick(event) {
 }
 
 function handleAlertClick(event) {
-  const target = event.target;
-  if (!(target instanceof HTMLButtonElement)) return;
-  const action = target.dataset.action;
-  const id = target.dataset.id;
-  if (action === "view-checklist") {
-    openChecklistView(id);
+  const button = event.target.closest("button");
+  if (button && button.dataset.action === "view-checklist") {
+    openChecklistView(button.dataset.id);
+    return;
   }
+
+  const card = event.target.closest(".alert-card");
+  if (!card) return;
+  const pcId = card.dataset.pcId;
+  if (!pcId) return;
+  const pc = state.data.pcs.find((item) => item.id === pcId);
+  if (!pc) return;
+
+  setActiveTab("mantenimientos");
+  maintenanceUserSelect.value = pc.usuario || "";
+  renderPcSelect();
+  maintenancePcSelect.value = pcId;
+  maintenanceTypeSelect.value = maintenanceTypeSelect.value || "total";
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function exportJson() {
@@ -3941,9 +3954,10 @@ if (window.appUpdates) {
     }
   });
 
-  window.appUpdates.onUpdateError(() => {
+  window.appUpdates.onUpdateError((error) => {
     closeUpdateLoading();
-    showToast(t("updateError"));
+    const detail = error ? ` (${error})` : "";
+    showToast(`${t("updateError")}${detail}`);
   });
 }
 

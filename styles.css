@@ -449,6 +449,16 @@ body.high-contrast {
   gap: 14px;
 }
 
+.panel[data-tab="configuracion"] .panel-sub {
+  padding: 14px;
+  margin-bottom: 12px;
+  gap: 10px;
+}
+
+.panel[data-tab="configuracion"] .panel-sub h3 {
+  font-size: 17px;
+}
+
 .panel-sub h3 {
   margin: 0;
   font-family: "Baskerville", "Garamond", serif;

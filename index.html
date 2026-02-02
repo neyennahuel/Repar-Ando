@@ -138,7 +138,12 @@
           </label>
           <label class="field">
             <span data-i18n="labelTecnico">Tecnico</span>
-            <input id="maintenanceTechInput" type="text" />
+            <input
+              id="maintenanceTechInput"
+              type="text"
+              placeholder="Ej: Juan Perez"
+              data-i18n-placeholder="placeholderTech"
+            />
           </label>
           <label class="field">
             <span data-i18n="labelAdjuntos">Adjuntos</span>
@@ -150,7 +155,12 @@
           </label>
           <label class="field field-span">
             <span data-i18n="labelObservaciones">Observaciones</span>
-            <textarea id="maintenanceNotesInput" rows="3"></textarea>
+            <textarea
+              id="maintenanceNotesInput"
+              rows="3"
+              placeholder="Detalles o comentarios del mantenimiento..."
+              data-i18n-placeholder="placeholderMaintenanceNotes"
+            ></textarea>
           </label>
           <div class="field field-span actions">
             <button id="clearFiltersBtn" type="button" class="btn ghost" data-i18n="btnClearFilter">
@@ -170,11 +180,21 @@
           <div class="panel-controls">
             <label class="field-inline">
               <span data-i18n="labelFrom">Desde</span>
-              <input id="historyFromInput" type="date" />
+              <input
+                id="historyFromInput"
+                type="date"
+                placeholder="Desde"
+                data-i18n-placeholder="placeholderDateFrom"
+              />
             </label>
             <label class="field-inline">
               <span data-i18n="labelTo">Hasta</span>
-              <input id="historyToInput" type="date" />
+              <input
+                id="historyToInput"
+                type="date"
+                placeholder="Hasta"
+                data-i18n-placeholder="placeholderDateTo"
+              />
             </label>
             <label class="field-inline">
               <span data-i18n="labelType">Tipo</span>
@@ -257,11 +277,25 @@
           </label>
           <label class="field">
             <span data-i18n="labelSupplyQty">Cantidad</span>
-            <input id="supplyQtyInput" type="number" min="0" step="1" />
+            <input
+              id="supplyQtyInput"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="Ej: 10"
+              data-i18n-placeholder="placeholderSupplyQty"
+            />
           </label>
           <label class="field">
             <span data-i18n="labelSupplyAlert">Alerta desde</span>
-            <input id="supplyAlertInput" type="number" min="0" step="1" />
+            <input
+              id="supplyAlertInput"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="Ej: 2"
+              data-i18n-placeholder="placeholderSupplyAlert"
+            />
           </label>
           <label class="field">
             <span data-i18n="labelSupplyLink">Link de compra (opcional)</span>
@@ -303,7 +337,13 @@
             <input id="groupIdInput" type="hidden" />
             <label class="field">
               <span data-i18n="labelNombre">Nombre</span>
-              <input id="groupNameInput" type="text" required />
+              <input
+                id="groupNameInput"
+                type="text"
+                required
+                placeholder="Ej: Oficina"
+                data-i18n-placeholder="placeholderGroupName"
+              />
             </label>
             <label class="field">
               <span data-i18n="labelCadaMeses">Cada (meses)</span>
@@ -313,6 +353,8 @@
                 min="1"
                 value="3"
                 required
+                placeholder="Ej: 3"
+                data-i18n-placeholder="placeholderGroupInterval"
               />
             </label>
             <label class="field">
@@ -323,6 +365,8 @@
                 min="0"
                 value="7"
                 required
+                placeholder="Ej: 7"
+                data-i18n-placeholder="placeholderGroupAlert"
               />
             </label>
             <div class="field field-span actions">
@@ -476,7 +520,14 @@
           <h3 data-i18n="sectionHistoryLimitTitle">Historial</h3>
           <label class="field-inline">
             <span data-i18n="labelHistoryLimit">Mantener ultimos</span>
-            <input id="historyLimitInput" type="number" min="1" max="50" />
+            <input
+              id="historyLimitInput"
+              type="number"
+              min="1"
+              max="50"
+              placeholder="Ej: 10"
+              data-i18n-placeholder="placeholderHistoryLimit"
+            />
             <span data-i18n="labelHistoryItems">registros</span>
           </label>
         </div>
@@ -518,10 +569,6 @@
               <span aria-hidden="true">&#9742;</span>
               <span data-i18n="btnPhone">01126980656</span>
             </a>
-            <button class="btn ghost icon-btn" type="button" disabled aria-label="Instagram (proximamente)" data-i18n-aria-label="ariaInstagram">
-              <span aria-hidden="true">ig</span>
-              <span data-i18n="btnInstagram">Instagram (pronto)</span>
-            </button>
           </div>
         </footer>
       </section>
@@ -560,15 +607,33 @@
         <input id="pcIdInput" type="hidden" />
         <label class="field">
           <span data-i18n="labelUsuario">Usuario</span>
-          <input id="pcUserInput" type="text" required />
+          <input
+            id="pcUserInput"
+            type="text"
+            required
+            placeholder="Ej: Maria Lopez"
+            data-i18n-placeholder="placeholderPcUser"
+          />
         </label>
         <label class="field">
           <span data-i18n="labelEquipo">Equipo</span>
-          <input id="pcEquipoInput" type="text" required />
+          <input
+            id="pcEquipoInput"
+            type="text"
+            required
+            placeholder="Ej: PC-OFI-01"
+            data-i18n-placeholder="placeholderPcEquipo"
+          />
         </label>
         <label class="field">
           <span data-i18n="labelIP">IP</span>
-          <input id="pcIpInput" type="text" required />
+          <input
+            id="pcIpInput"
+            type="text"
+            required
+            placeholder="Ej: 192.168.1.50"
+            data-i18n-placeholder="placeholderPcIp"
+          />
         </label>
         <label class="field">
           <span data-i18n="labelGrupo">Grupo</span>
@@ -584,7 +649,12 @@
         </label>
         <label class="field field-span">
           <span data-i18n="labelNotas">Notas</span>
-          <textarea id="pcNotesInput" rows="3"></textarea>
+          <textarea
+            id="pcNotesInput"
+            rows="3"
+            placeholder="Notas del equipo..."
+            data-i18n-placeholder="placeholderPcNotes"
+          ></textarea>
         </label>
         <div class="actions">
           <button type="button" class="btn danger action-delete is-hidden" id="pcDeleteBtn" data-i18n="btnDeletePc">

@@ -9,8 +9,10 @@ $ErrorActionPreference = "Stop"
 function Update-VersionFile($file, $version) {
   $data = Get-Content -Raw -Path $file | ConvertFrom-Json
   if ($data.version) { $data.version = $version }
-  if ($data.packages -and $data.packages."") {
-    if ($data.packages."".version) { $data.packages."".version = $version }
+  if ($data.PSObject.Properties.Name -contains "packages") {
+    if ($data.packages -and $data.packages."") {
+      if ($data.packages."".version) { $data.packages."".version = $version }
+    }
   }
   $data | ConvertTo-Json -Depth 20 | Set-Content -Path $file
 }

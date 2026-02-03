@@ -226,6 +226,7 @@ body::-webkit-scrollbar-button:vertical:increment {
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
   min-width: 200px;
+  margin-right: auto;
 }
 
 .hero-share-title {

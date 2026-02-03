@@ -1273,7 +1273,6 @@ const checklistViewContainer = document.getElementById(
 );
 const heroShare = document.getElementById("heroShare");
 const shareQrImg = document.getElementById("shareQrImg");
-const shareQrLink = document.getElementById("shareQrLink");
 const checklistViewTitle = document.getElementById("checklistViewTitle");
 const checklistViewCloseBtn = document.getElementById("checklistViewCloseBtn");
 const attachmentsDialog = document.getElementById("attachmentsDialog");
@@ -1600,7 +1599,7 @@ function syncShareData() {
 }
 
 async function refreshShareQr() {
-  if (!window.maintenanceShare || !shareQrImg || !shareQrLink || !heroShare) {
+  if (!window.maintenanceShare || !shareQrImg || !heroShare) {
     return;
   }
   const result = await window.maintenanceShare.getUrls();
@@ -1610,7 +1609,6 @@ async function refreshShareQr() {
     return;
   }
   const url = urls[0];
-  shareQrLink.href = url;
   shareQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(
     url
   )}`;

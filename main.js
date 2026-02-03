@@ -62,29 +62,28 @@ function startShareServer() {
   if (shareServer) return;
   shareServer = http.createServer((req, res) => {
     const url = new URL(req.url || "/", "http://localhost");
-    if (url.pathname === "/api/maintenance") {
-      res.setHeader("Content-Type", "application/json; charset=utf-8");
-      res.setHeader("Access-Control-Allow-Origin", "*");
-      if (!shareData) {
-        res.statusCode = 503;
-        res.end(JSON.stringify({ error: "no-data" }));
-        return;
-      }
-      const rows = buildMaintenanceRows(shareData);
-      res.end(
-        JSON.stringify({
-          updatedAt: shareUpdatedAt,
-          rows,
-        })
-      );
-      return;
-    }
-
     if (url.pathname !== "/") {
       res.statusCode = 404;
       res.end("Not found");
       return;
     }
+
+    const rows = buildMaintenanceRows(shareData);
+    const rowsHtml = rows.length
+      ? rows
+          .map(
+            (row) => `
+        <tr>
+          <td>${row.date || "-"}</td>
+          <td>${row.equipo || "-"}</td>
+          <td>${row.usuario || "-"}</td>
+          <td>${row.tipo || "-"}</td>
+          <td>${row.tecnico || "-"}</td>
+          <td>${row.notas || "-"}</td>
+        </tr>`
+          )
+          .join("")
+      : '<tr><td class="empty" colspan="6">Sin datos.</td></tr>';
 
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.end(`<!doctype html>
@@ -98,8 +97,6 @@ function startShareServer() {
       body { margin: 0; font-family: "Cambria", serif; background: #f9f4ed; color: #3b2f2a; }
       header { padding: 16px 20px; background: #fff7eb; border-bottom: 1px solid #e7c7a0; }
       h1 { margin: 0 0 8px; font-size: 22px; }
-      .filters { display: flex; gap: 12px; flex-wrap: wrap; }
-      .filters input { padding: 8px 10px; border-radius: 10px; border: 1px solid #e7c7a0; background: #fff; }
       .container { padding: 16px 20px 32px; }
       table { width: 100%; border-collapse: collapse; background: #fffdf9; border-radius: 12px; overflow: hidden; }
       th, td { padding: 10px 12px; border-bottom: 1px solid #f0dcc0; text-align: left; font-size: 14px; }
@@ -111,9 +108,6 @@ function startShareServer() {
   <body>
     <header>
       <h1>Mantenimientos</h1>
-      <div class="filters">
-        <input id="userFilter" type="text" placeholder="Filtrar por usuario..." />
-      </div>
     </header>
     <div class="container">
       <table>
@@ -127,68 +121,21 @@ function startShareServer() {
             <th>Notas</th>
           </tr>
         </thead>
-        <tbody id="rows"></tbody>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
       </table>
       <div class="meta" id="updatedAt"></div>
     </div>
     <script>
-      const rowsEl = document.getElementById("rows");
       const updatedAtEl = document.getElementById("updatedAt");
-      const userFilter = document.getElementById("userFilter");
-      const params = new URLSearchParams(window.location.search);
-      const preset = params.get("user") || "";
-      if (preset) userFilter.value = preset;
-
-      let cache = [];
-
-      function formatDate(value) {
-        if (!value) return "-";
-        const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return value;
-        return d.toLocaleDateString();
-      }
-
-      function render() {
-        const query = userFilter.value.trim().toLowerCase();
-        const data = query
-          ? cache.filter((row) => row.usuario.toLowerCase().includes(query))
-          : cache;
-        rowsEl.innerHTML = "";
-        if (!data.length) {
-          rowsEl.innerHTML = '<tr><td class="empty" colspan="6">Sin resultados.</td></tr>';
-          return;
+      const updatedAt = ${shareUpdatedAt ? `"${shareUpdatedAt}"` : "null"};
+      if (updatedAt) {
+        const date = new Date(updatedAt);
+        if (!Number.isNaN(date.getTime())) {
+          updatedAtEl.textContent = "Actualizado: " + date.toLocaleString();
         }
-        data.forEach((row) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = \`
-            <td>\${formatDate(row.date)}</td>
-            <td>\${row.equipo || "-"}</td>
-            <td>\${row.usuario || "-"}</td>
-            <td>\${row.tipo || "-"}</td>
-            <td>\${row.tecnico || "-"}</td>
-            <td>\${row.notas || "-"}</td>
-          \`;
-          rowsEl.appendChild(tr);
-        });
       }
-
-      userFilter.addEventListener("input", render);
-
-      fetch("/api/maintenance")
-        .then((res) => res.json())
-        .then((payload) => {
-          cache = payload.rows || [];
-          if (payload.updatedAt) {
-            const date = new Date(payload.updatedAt);
-            if (!Number.isNaN(date.getTime())) {
-              updatedAtEl.textContent = "Actualizado: " + date.toLocaleString();
-            }
-          }
-          render();
-        })
-        .catch(() => {
-          rowsEl.innerHTML = '<tr><td class="empty" colspan="6">No se pudo cargar.</td></tr>';
-        });
     </script>
   </body>
 </html>`);

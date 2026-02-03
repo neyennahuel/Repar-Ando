@@ -51,3 +51,8 @@ contextBridge.exposeInMainWorld("appUpdates", {
   onUpdateError: (handler) =>
     ipcRenderer.on("updates:error", (_event, error) => handler(error)),
 });
+
+contextBridge.exposeInMainWorld("maintenanceShare", {
+  update: (data) => ipcRenderer.send("share:update", data),
+  getUrls: () => ipcRenderer.invoke("share:get-urls"),
+});

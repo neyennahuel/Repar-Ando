@@ -38,6 +38,18 @@
             <p data-i18n="heroSubtitle">Calendario, checklist e inventario de PCs en un solo lugar.</p>
           </div>
         </button>
+        <div class="hero-share" id="heroShare">
+          <div class="hero-share-title" data-i18n="shareTitle">Mantenimientos en el celu</div>
+          <div class="hero-share-qr">
+            <img id="shareQrImg" alt="QR" />
+          </div>
+          <a id="shareQrLink" class="hero-share-link" href="#" target="_blank" rel="noreferrer" data-i18n="shareLinkLabel">
+            Abrir en el celular
+          </a>
+          <p class="helper-text" data-i18n="shareHint">
+            Escaneá el QR para ver mantenimientos y filtrar por usuario.
+          </p>
+        </div>
         <div class="hero-actions">
           <button id="addPcBtn" class="btn primary" data-i18n="btnAddPc">Agregar PC</button>
           <button id="exportBtn" class="btn ghost" data-i18n="btnExport">Exportar</button>
@@ -178,6 +190,15 @@
         <div class="panel-header">
           <h2 data-i18n="sectionHistoryTitle">Historial de mantenimientos</h2>
           <div class="panel-controls">
+            <label class="field-inline">
+              <span data-i18n="labelUsuario">Usuario</span>
+              <input
+                id="historyUserInput"
+                type="text"
+                placeholder="Ej: Maria Lopez"
+                data-i18n-placeholder="placeholderHistoryUser"
+              />
+            </label>
             <label class="field-inline">
               <span data-i18n="labelFrom">Desde</span>
               <input

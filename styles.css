@@ -217,6 +217,46 @@ body::-webkit-scrollbar-button:vertical:increment {
   justify-content: space-between;
 }
 
+.hero-share {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #fffdf9;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  min-width: 200px;
+}
+
+.hero-share-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.hero-share-qr {
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid var(--line);
+}
+
+.hero-share-qr img {
+  width: 120px;
+  height: 120px;
+}
+
+.hero-share-link {
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.hero-share-link:hover {
+  text-decoration: underline;
+}
+
 .brand {
   display: flex;
   gap: 18px;
@@ -1108,6 +1148,15 @@ th {
 
   main {
     padding: 0 6vw 40px;
+  }
+
+  .hero-share {
+    width: 100%;
+  }
+
+  .hero-share-qr img {
+    width: 110px;
+    height: 110px;
   }
 
   .hero-actions {

@@ -1,4 +1,7 @@
 const { app, BrowserWindow, ipcMain, Menu, shell, Notification } = require("electron");
+const fs = require("fs");
+const http = require("http");
+const os = require("os");
 const path = require("path");
 
 if (process.env.NODE_ENV === "development") {
@@ -12,6 +15,203 @@ if (process.env.NODE_ENV === "development") {
 let mainWindow = null;
 let updateMode = "ask";
 let autoUpdater = null;
+const updaterCacheDirName = "repar-ando-updater";
+const sharePort = 47211;
+let shareServer = null;
+let shareData = null;
+let shareUpdatedAt = null;
+
+function getLocalIPv4s() {
+  const interfaces = os.networkInterfaces();
+  const ips = [];
+  Object.values(interfaces).forEach((entries) => {
+    (entries || []).forEach((entry) => {
+      if (entry.family !== "IPv4") return;
+      if (entry.internal) return;
+      ips.push(entry.address);
+    });
+  });
+  return ips;
+}
+
+function buildMaintenanceRows(data) {
+  const rows = [];
+  if (!data || !Array.isArray(data.pcs)) return rows;
+  data.pcs.forEach((pc) => {
+    (pc.maintenanceHistory || []).forEach((record) => {
+      if (record.hidden) return;
+      rows.push({
+        date: record.date || "",
+        equipo: pc.equipo || "",
+        usuario: pc.usuario || "",
+        tipo: record.type || "",
+        tecnico: record.technician || "",
+        notas: record.notes || "",
+      });
+    });
+  });
+  rows.sort((a, b) => {
+    const aTime = new Date(a.date).getTime() || 0;
+    const bTime = new Date(b.date).getTime() || 0;
+    return bTime - aTime;
+  });
+  return rows;
+}
+
+function startShareServer() {
+  if (shareServer) return;
+  shareServer = http.createServer((req, res) => {
+    const url = new URL(req.url || "/", "http://localhost");
+    if (url.pathname === "/api/maintenance") {
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      if (!shareData) {
+        res.statusCode = 503;
+        res.end(JSON.stringify({ error: "no-data" }));
+        return;
+      }
+      const rows = buildMaintenanceRows(shareData);
+      res.end(
+        JSON.stringify({
+          updatedAt: shareUpdatedAt,
+          rows,
+        })
+      );
+      return;
+    }
+
+    if (url.pathname !== "/") {
+      res.statusCode = 404;
+      res.end("Not found");
+      return;
+    }
+
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.end(`<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Repar-Ando - Mantenimientos</title>
+    <style>
+      :root { color-scheme: light; }
+      body { margin: 0; font-family: "Cambria", serif; background: #f9f4ed; color: #3b2f2a; }
+      header { padding: 16px 20px; background: #fff7eb; border-bottom: 1px solid #e7c7a0; }
+      h1 { margin: 0 0 8px; font-size: 22px; }
+      .filters { display: flex; gap: 12px; flex-wrap: wrap; }
+      .filters input { padding: 8px 10px; border-radius: 10px; border: 1px solid #e7c7a0; background: #fff; }
+      .container { padding: 16px 20px 32px; }
+      table { width: 100%; border-collapse: collapse; background: #fffdf9; border-radius: 12px; overflow: hidden; }
+      th, td { padding: 10px 12px; border-bottom: 1px solid #f0dcc0; text-align: left; font-size: 14px; }
+      th { background: #fff4e3; font-weight: 700; }
+      .empty { padding: 20px; text-align: center; color: #8b6a4a; }
+      .meta { font-size: 12px; color: #8b6a4a; margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Mantenimientos</h1>
+      <div class="filters">
+        <input id="userFilter" type="text" placeholder="Filtrar por usuario..." />
+      </div>
+    </header>
+    <div class="container">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Equipo</th>
+            <th>Usuario</th>
+            <th>Tipo</th>
+            <th>Tecnico</th>
+            <th>Notas</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="meta" id="updatedAt"></div>
+    </div>
+    <script>
+      const rowsEl = document.getElementById("rows");
+      const updatedAtEl = document.getElementById("updatedAt");
+      const userFilter = document.getElementById("userFilter");
+      const params = new URLSearchParams(window.location.search);
+      const preset = params.get("user") || "";
+      if (preset) userFilter.value = preset;
+
+      let cache = [];
+
+      function formatDate(value) {
+        if (!value) return "-";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return value;
+        return d.toLocaleDateString();
+      }
+
+      function render() {
+        const query = userFilter.value.trim().toLowerCase();
+        const data = query
+          ? cache.filter((row) => row.usuario.toLowerCase().includes(query))
+          : cache;
+        rowsEl.innerHTML = "";
+        if (!data.length) {
+          rowsEl.innerHTML = '<tr><td class="empty" colspan="6">Sin resultados.</td></tr>';
+          return;
+        }
+        data.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = \`
+            <td>\${formatDate(row.date)}</td>
+            <td>\${row.equipo || "-"}</td>
+            <td>\${row.usuario || "-"}</td>
+            <td>\${row.tipo || "-"}</td>
+            <td>\${row.tecnico || "-"}</td>
+            <td>\${row.notas || "-"}</td>
+          \`;
+          rowsEl.appendChild(tr);
+        });
+      }
+
+      userFilter.addEventListener("input", render);
+
+      fetch("/api/maintenance")
+        .then((res) => res.json())
+        .then((payload) => {
+          cache = payload.rows || [];
+          if (payload.updatedAt) {
+            const date = new Date(payload.updatedAt);
+            if (!Number.isNaN(date.getTime())) {
+              updatedAtEl.textContent = "Actualizado: " + date.toLocaleString();
+            }
+          }
+          render();
+        })
+        .catch(() => {
+          rowsEl.innerHTML = '<tr><td class="empty" colspan="6">No se pudo cargar.</td></tr>';
+        });
+    </script>
+  </body>
+</html>`);
+  });
+
+  shareServer.listen(sharePort, "0.0.0.0");
+}
+
+function getUpdaterCacheDir() {
+  const localAppData = app.getPath("localAppData");
+  return path.join(localAppData, updaterCacheDirName);
+}
+
+function clearUpdaterCache() {
+  try {
+    const dir = getUpdaterCacheDir();
+    if (fs.existsSync(dir)) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  } catch {
+    // ignore cache cleanup failures
+  }
+}
 
 function sendUpdateEvent(channel, payload) {
   if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -74,6 +274,7 @@ function createWindow() {
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
   createWindow();
+  startShareServer();
 
   if (app.isPackaged) {
     try {
@@ -134,12 +335,30 @@ ipcMain.on("updates:set-mode", (event, mode) => {
   configureAutoUpdater(mode);
 });
 
+ipcMain.on("share:update", (_event, data) => {
+  shareData = data;
+  shareUpdatedAt = new Date().toISOString();
+});
+
+ipcMain.handle("share:get-urls", () => {
+  const ips = getLocalIPv4s();
+  return {
+    urls: ips.map((ip) => `http://${ip}:${sharePort}`),
+  };
+});
+
 ipcMain.handle("updates:check", async () => {
   if (!app.isPackaged || !autoUpdater) return null;
   try {
     return await autoUpdater.checkForUpdates();
   } catch {
-    sendUpdateEvent("updates:error");
+    clearUpdaterCache();
+    try {
+      return await autoUpdater.checkForUpdates();
+    } catch (error) {
+      sendUpdateEvent("updates:error", error?.message || String(error));
+      return null;
+    }
     return null;
   }
 });
@@ -179,7 +398,7 @@ function wireUpdaterEvents() {
   });
 
   autoUpdater.on("error", (error) => {
-    sendUpdateEvent("updates:error", error);
+    sendUpdateEvent("updates:error", error?.message || String(error));
   });
 }
 

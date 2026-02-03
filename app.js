@@ -558,6 +558,7 @@ const i18n = {
     placeholderMaintenanceNotes: "Detalhes ou observacoes da manutencao...",
     placeholderDateFrom: "De",
     placeholderDateTo: "Ate",
+    placeholderHistoryUser: "Ex: Maria Lopez",
     placeholderGroupName: "Ex: Escritorio",
     placeholderGroupInterval: "Ex: 3",
     placeholderGroupAlert: "Ex: 7",
@@ -566,10 +567,14 @@ const i18n = {
     placeholderPcEquipo: "Ex: PC-OFI-01",
     placeholderPcIp: "Ex: 192.168.1.50",
     placeholderPcNotes: "Notas do equipamento...",
+    shareTitle: "Manutencoes no celular",
+    shareHint: "Escaneie o QR para ver manutencoes e filtrar por usuario.",
+    shareLinkLabel: "Abrir no celular",
     placeholderTech: "Ej: Juan Perez",
     placeholderMaintenanceNotes: "Detalles o comentarios del mantenimiento...",
     placeholderDateFrom: "Desde",
     placeholderDateTo: "Hasta",
+    placeholderHistoryUser: "Ej: Maria Lopez",
     placeholderGroupName: "Ej: Oficina",
     placeholderGroupInterval: "Ej: 3",
     placeholderGroupAlert: "Ej: 7",
@@ -578,6 +583,9 @@ const i18n = {
     placeholderPcEquipo: "Ej: PC-OFI-01",
     placeholderPcIp: "Ej: 192.168.1.50",
     placeholderPcNotes: "Notas del equipo...",
+    shareTitle: "Mantenimientos en el celu",
+    shareHint: "Escaneá el QR para ver mantenimientos y filtrar por usuario.",
+    shareLinkLabel: "Abrir en el celular",
     labelDefaultGroup: "Por defecto",
     labelGroupFallback: "Grupo",
     labelSection: "Seccion",
@@ -854,6 +862,7 @@ const i18n = {
     placeholderMaintenanceNotes: "Maintenance details or notes...",
     placeholderDateFrom: "From",
     placeholderDateTo: "To",
+    placeholderHistoryUser: "e.g. Maria Lopez",
     placeholderGroupName: "e.g. Office",
     placeholderGroupInterval: "e.g. 3",
     placeholderGroupAlert: "e.g. 7",
@@ -862,6 +871,9 @@ const i18n = {
     placeholderPcEquipo: "e.g. PC-OFF-01",
     placeholderPcIp: "e.g. 192.168.1.50",
     placeholderPcNotes: "PC notes...",
+    shareTitle: "Maintenance on your phone",
+    shareHint: "Scan the QR to view maintenance and filter by user.",
+    shareLinkLabel: "Open on phone",
     labelDefaultGroup: "Default",
     labelGroupFallback: "Group",
     labelSection: "Section",
@@ -1217,6 +1229,7 @@ const clearFiltersBtn = document.getElementById("clearFiltersBtn");
 const searchInput = document.getElementById("searchInput");
 const historyFromInput = document.getElementById("historyFromInput");
 const historyToInput = document.getElementById("historyToInput");
+const historyUserInput = document.getElementById("historyUserInput");
 const historyTypeSelect = document.getElementById("historyTypeSelect");
 const toast = document.getElementById("toast");
 const groupForm = document.getElementById("groupForm");
@@ -1258,6 +1271,9 @@ const checklistViewDialog = document.getElementById("checklistViewDialog");
 const checklistViewContainer = document.getElementById(
   "checklistViewContainer"
 );
+const heroShare = document.getElementById("heroShare");
+const shareQrImg = document.getElementById("shareQrImg");
+const shareQrLink = document.getElementById("shareQrLink");
 const checklistViewTitle = document.getElementById("checklistViewTitle");
 const checklistViewCloseBtn = document.getElementById("checklistViewCloseBtn");
 const attachmentsDialog = document.getElementById("attachmentsDialog");
@@ -1575,6 +1591,29 @@ function trimMaintenanceHistory(pc) {
 
 function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+  syncShareData();
+}
+
+function syncShareData() {
+  if (!window.maintenanceShare?.update) return;
+  window.maintenanceShare.update(state.data);
+}
+
+async function refreshShareQr() {
+  if (!window.maintenanceShare || !shareQrImg || !shareQrLink || !heroShare) {
+    return;
+  }
+  const result = await window.maintenanceShare.getUrls();
+  const urls = result?.urls || [];
+  if (!urls.length) {
+    heroShare.classList.add("is-hidden");
+    return;
+  }
+  const url = urls[0];
+  shareQrLink.href = url;
+  shareQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(
+    url
+  )}`;
 }
 
 function parseDateOnly(value) {
@@ -2217,11 +2256,13 @@ function renderMaintenanceHistory() {
   const fromValue = historyFromInput.value;
   const toValue = historyToInput.value;
   const typeFilter = historyTypeSelect.value;
+  const userFilter = (historyUserInput?.value || "").toLowerCase().trim();
 
   state.data.pcs.forEach((pc) => {
     (pc.maintenanceHistory || []).forEach((record) => {
       if (record.hidden) return;
       if (typeFilter && record.type !== typeFilter) return;
+      if (userFilter && !pc.usuario.toLowerCase().includes(userFilter)) return;
       if (fromValue || toValue) {
         const date = new Date(record.date);
         if (Number.isNaN(date.getTime())) return;
@@ -4057,6 +4098,9 @@ searchInput.addEventListener("input", renderTable);
 historyFromInput.addEventListener("change", renderMaintenanceHistory);
 historyToInput.addEventListener("change", renderMaintenanceHistory);
 historyTypeSelect.addEventListener("change", renderMaintenanceHistory);
+if (historyUserInput) {
+  historyUserInput.addEventListener("input", renderMaintenanceHistory);
+}
 maintenanceUserSelect.addEventListener("change", () => {
   renderPcSelect();
   renderUserSuggestions();
@@ -4165,3 +4209,5 @@ applyTranslations();
 applyTheme();
 setActiveTab("alertas");
 renderAll();
+syncShareData();
+refreshShareQr();

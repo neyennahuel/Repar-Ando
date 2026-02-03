@@ -1,13 +1,14 @@
 {
   "name": "repar-ando",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Gestion de mantenimiento local",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dev": "set NODE_ENV=development && electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --win --x64 && node scripts/verify-release-assets.js"
+    "dist": "electron-builder --win --x64 && node scripts/verify-release-assets.js",
+    "release": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\\release.ps1"
   },
   "dependencies": {
     "electron-updater": "^6.1.8",

@@ -217,47 +217,6 @@ body::-webkit-scrollbar-button:vertical:increment {
   justify-content: space-between;
 }
 
-.hero-share {
-  display: grid;
-  gap: 8px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: #fffdf9;
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  min-width: 200px;
-  margin-right: auto;
-}
-
-.hero-share-title {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.hero-share-qr {
-  display: grid;
-  place-items: center;
-  background: #fff;
-  border-radius: 12px;
-  padding: 8px;
-  border: 1px solid var(--line);
-}
-
-.hero-share-qr img {
-  width: 120px;
-  height: 120px;
-}
-
-.hero-share-link {
-  font-weight: 700;
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.hero-share-link:hover {
-  text-decoration: underline;
-}
-
 .brand {
   display: flex;
   gap: 18px;
@@ -281,16 +240,19 @@ body::-webkit-scrollbar-button:vertical:increment {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
   border-radius: 18px;
-  font-family: "Baskerville", "Palatino", serif;
-  font-size: 26px;
-  color: #fff;
-  background: linear-gradient(135deg, #b45309, #f59e0b);
-  box-shadow: var(--shadow);
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
 }
 
+.brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 h1 {
   margin: 0 0 6px;
   font-family: "Baskerville", "Garamond", serif;
@@ -804,6 +766,17 @@ textarea {
   flex-wrap: wrap;
 }
 
+.chart-month {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 8px;
+}
+
+.chart-month-select {
+  margin-left: auto;
+}
+
 .summary-chart-header h3 {
   margin: 0;
   font-family: "Baskerville", "Garamond", serif;
@@ -1149,15 +1122,6 @@ th {
 
   main {
     padding: 0 6vw 40px;
-  }
-
-  .hero-share {
-    width: 100%;
-  }
-
-  .hero-share-qr img {
-    width: 110px;
-    height: 110px;
   }
 
   .hero-actions {

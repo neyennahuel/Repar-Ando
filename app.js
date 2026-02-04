@@ -282,11 +282,12 @@ const defaultSettings = {
   darkMode: false,
   largeText: false,
   highContrast: false,
+  dailyChartMonth: null,
 };
 
 const i18n = {
   es: {
-    heroSubtitle: "Calendario, checklist e inventario de PCs en un solo lugar.",
+    heroSubtitle: "Calendario, checklist e inventario en un solo lugar.",
     btnAddPc: "Agregar PC",
     btnExportJson: "Exportar JSON",
     btnImportJson: "Importar JSON",
@@ -409,6 +410,8 @@ const i18n = {
     switchHighContrast: "Alto contraste",
     sectionDateFormatTitle: "Formato de fecha",
     labelDateFormat: "Formato",
+    labelMonth: "Mes",
+    labelMonth: "Mes",
     dateFormatLocale: "Automatico",
     dateFormatDMY: "DD/MM/AAAA",
     dateFormatMDY: "MM/DD/AAAA",
@@ -567,7 +570,6 @@ const i18n = {
     placeholderPcEquipo: "Ex: PC-OFI-01",
     placeholderPcIp: "Ex: 192.168.1.50",
     placeholderPcNotes: "Notas do equipamento...",
-    shareTitle: "Manutencoes no celular",
     shareHint: "Escaneie o QR para ver manutencoes e filtrar por usuario.",
     shareLinkLabel: "Abrir no celular",
     placeholderTech: "Ej: Juan Perez",
@@ -583,7 +585,6 @@ const i18n = {
     placeholderPcEquipo: "Ej: PC-OFI-01",
     placeholderPcIp: "Ej: 192.168.1.50",
     placeholderPcNotes: "Notas del equipo...",
-    shareTitle: "Mantenimientos en el celu",
     shareHint: "Escaneá el QR para ver mantenimientos y filtrar por usuario.",
     shareLinkLabel: "Abrir en el celular",
     labelDefaultGroup: "Por defecto",
@@ -592,7 +593,7 @@ const i18n = {
     labelMonth: "{month}",
   },
   en: {
-    heroSubtitle: "Calendar, checklist, and PC inventory in one place.",
+    heroSubtitle: "Calendar, checklist, and inventory in one place.",
     btnAddPc: "Add PC",
     btnExportJson: "Export JSON",
     btnImportJson: "Import JSON",
@@ -716,6 +717,7 @@ const i18n = {
     dateFormatLocale: "Automatic",
     dateFormatDMY: "DD/MM/YYYY",
     dateFormatMDY: "MM/DD/YYYY",
+    labelMonth: "Month",
     sectionHistoryLimitTitle: "History",
     labelHistoryLimit: "Keep last",
     labelHistoryItems: "records",
@@ -871,7 +873,6 @@ const i18n = {
     placeholderPcEquipo: "e.g. PC-OFF-01",
     placeholderPcIp: "e.g. 192.168.1.50",
     placeholderPcNotes: "PC notes...",
-    shareTitle: "Maintenance on your phone",
     shareHint: "Scan the QR to view maintenance and filter by user.",
     shareLinkLabel: "Open on phone",
     labelDefaultGroup: "Default",
@@ -879,7 +880,7 @@ const i18n = {
     labelSection: "Section",
   },
   pt: {
-    heroSubtitle: "Calendario, checklist e inventario de PCs em um só lugar.",
+    heroSubtitle: "Calendario, checklist e inventario em um só lugar.",
     btnAddPc: "Adicionar PC",
     btnExportJson: "Exportar JSON",
     btnImportJson: "Importar JSON",
@@ -998,6 +999,7 @@ const i18n = {
     switchHighContrast: "Alto contraste",
     sectionDateFormatTitle: "Formato de data",
     labelDateFormat: "Formato",
+    labelMonth: "Mes",
     dateFormatLocale: "Automatico",
     dateFormatDMY: "DD/MM/AAAA",
     dateFormatMDY: "MM/DD/AAAA",
@@ -1187,6 +1189,12 @@ const maintenanceDailyChart = document.getElementById("maintenanceDailyChart");
 const maintenanceDailyChartLegend = document.getElementById(
   "maintenanceDailyChartLegend"
 );
+const maintenanceDailyMonthLabel = document.getElementById(
+  "maintenanceDailyMonthLabel"
+);
+const maintenanceDailyMonthSelect = document.getElementById(
+  "maintenanceDailyMonthSelect"
+);
 const startNextSwitch = document.getElementById("startNextSwitch");
 const languageSelect = document.getElementById("languageSelect");
 const notificationsSwitch = document.getElementById("notificationsSwitch");
@@ -1271,8 +1279,6 @@ const checklistViewDialog = document.getElementById("checklistViewDialog");
 const checklistViewContainer = document.getElementById(
   "checklistViewContainer"
 );
-const heroShare = document.getElementById("heroShare");
-const shareQrImg = document.getElementById("shareQrImg");
 const checklistViewTitle = document.getElementById("checklistViewTitle");
 const checklistViewCloseBtn = document.getElementById("checklistViewCloseBtn");
 const attachmentsDialog = document.getElementById("attachmentsDialog");
@@ -1590,28 +1596,6 @@ function trimMaintenanceHistory(pc) {
 
 function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
-  syncShareData();
-}
-
-function syncShareData() {
-  if (!window.maintenanceShare?.update) return;
-  window.maintenanceShare.update(state.data);
-}
-
-async function refreshShareQr() {
-  if (!window.maintenanceShare || !shareQrImg || !heroShare) {
-    return;
-  }
-  const result = await window.maintenanceShare.getUrls();
-  const urls = result?.urls || [];
-  if (!urls.length) {
-    heroShare.classList.add("is-hidden");
-    return;
-  }
-  const url = urls[0];
-  shareQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(
-    url
-  )}`;
 }
 
 function parseDateOnly(value) {
@@ -1778,22 +1762,41 @@ function buildMonthlyMaintenanceSeries(months = 12) {
 }
 
 function buildDailyMaintenanceSeries() {
+  const now = new Date();
+  const monthValue =
+    settings.dailyChartMonth || `${now.getFullYear()}-${now.getMonth() + 1}`;
+  const [yearStr, monthStr] = monthValue.split("-");
+  const year = Number(yearStr);
+  const month = Math.max(1, Math.min(12, Number(monthStr))) - 1;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
   const series = [];
   const counts = new Map();
-  for (let day = 1; day <= 31; day += 1) {
+  for (let day = 1; day <= daysInMonth; day += 1) {
     const key = String(day);
     counts.set(key, 0);
     series.push({ key, label: String(day), count: 0 });
   }
+
   state.data.pcs.forEach((pc) => {
     (pc.maintenanceHistory || []).forEach((record) => {
       if (record.hidden) return;
       const date = new Date(record.date);
       if (Number.isNaN(date.getTime())) return;
+      if (date.getFullYear() !== year || date.getMonth() !== month) return;
       const key = String(date.getDate());
       counts.set(key, (counts.get(key) || 0) + 1);
     });
   });
+
+  if (maintenanceDailyMonthLabel) {
+    const labelDate = new Date(year, month, 1);
+    maintenanceDailyMonthLabel.textContent = labelDate.toLocaleString(
+      getLocale(),
+      { month: "long" }
+    );
+  }
+
   return series.map((item) => ({
     ...item,
     count: counts.get(item.key) || 0,
@@ -1958,6 +1961,24 @@ function renderSummary() {
 
   const monthlySeries = buildMonthlyMaintenanceSeries(12);
   requestAnimationFrame(() => renderMaintenanceChart(monthlySeries));
+  if (maintenanceDailyMonthSelect) {
+    const now = new Date();
+    const currentValue =
+      settings.dailyChartMonth || `${now.getFullYear()}-${now.getMonth() + 1}`;
+    if (!maintenanceDailyMonthSelect.options.length) {
+      maintenanceDailyMonthSelect.innerHTML = "";
+      for (let offset = 0; offset < 12; offset += 1) {
+        const date = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+        const value = `${date.getFullYear()}-${date.getMonth() + 1}`;
+        const label = date.toLocaleString(getLocale(), { month: "long", year: "numeric" });
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        maintenanceDailyMonthSelect.appendChild(option);
+      }
+    }
+    maintenanceDailyMonthSelect.value = currentValue;
+  }
   const dailySeries = buildDailyMaintenanceSeries();
   requestAnimationFrame(() => renderDailyMaintenanceChart(dailySeries));
 }
@@ -4008,6 +4029,15 @@ if (exportAllBtn) {
   });
 }
 
+if (maintenanceDailyMonthSelect) {
+  maintenanceDailyMonthSelect.addEventListener("change", () => {
+    settings.dailyChartMonth = maintenanceDailyMonthSelect.value;
+    saveSettings();
+    const dailySeries = buildDailyMaintenanceSeries();
+    renderDailyMaintenanceChart(dailySeries);
+  });
+}
+
 if (exportSuppliesExcelBtn) {
   exportSuppliesExcelBtn.addEventListener("click", () => {
     exportSuppliesExcel();
@@ -4207,5 +4237,3 @@ applyTranslations();
 applyTheme();
 setActiveTab("alertas");
 renderAll();
-syncShareData();
-refreshShareQr();

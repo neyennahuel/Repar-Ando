@@ -32,18 +32,14 @@
     <header class="hero">
       <div class="hero-content">
         <button class="brand brand-btn" id="brandHomeBtn" type="button">
-          <span class="brand-mark">RA</span>
+          <span class="brand-mark">
+            <img src="assets/icono-square.png" alt="Repar-Ando" class="brand-logo" />
+          </span>
           <div>
             <h1>Repar-Ando</h1>
-            <p data-i18n="heroSubtitle">Calendario, checklist e inventario de PCs en un solo lugar.</p>
+            <p data-i18n="heroSubtitle">Calendario, checklist e inventario en un solo lugar.</p>
           </div>
         </button>
-        <div class="hero-share" id="heroShare">
-          <div class="hero-share-title" data-i18n="shareTitle">Mantenimientos en el celu</div>
-          <div class="hero-share-qr">
-            <img id="shareQrImg" alt="QR" />
-          </div>
-        </div>
         <div class="hero-actions">
           <button id="addPcBtn" class="btn primary" data-i18n="btnAddPc">Agregar PC</button>
           <button id="exportBtn" class="btn ghost" data-i18n="btnExport">Exportar</button>
@@ -103,8 +99,14 @@
         </div>
         <div class="summary-chart">
           <div class="summary-chart-header">
-            <h3 data-i18n="chartDailyTitle">Mantenimientos por dia</h3>
-            <span class="summary-chart-note" data-i18n="chartDailyNote">Todos los registros</span>
+            <h3 data-i18n="chartDailyTitle">
+              Mantenimientos por dia
+              <span id="maintenanceDailyMonthLabel" class="chart-month">-</span>
+            </h3>
+            <label class="field-inline chart-month-select">
+              <span data-i18n="labelMonth">Mes</span>
+              <select id="maintenanceDailyMonthSelect"></select>
+            </label>
           </div>
           <canvas id="maintenanceDailyChart" width="800" height="240" aria-label="Grafico de mantenimientos por dia" role="img" data-i18n-aria-label="chartDailyAria"></canvas>
           <div id="maintenanceDailyChartLegend" class="chart-legend"></div>

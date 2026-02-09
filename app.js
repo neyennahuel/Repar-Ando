@@ -1837,14 +1837,16 @@ function renderMaintenanceChartFor(canvas, legend, series) {
 
   ctx.strokeStyle = "rgba(226, 201, 166, 0.6)";
   ctx.lineWidth = 1;
-  ctx.fillStyle = "rgba(92, 79, 66, 0.75)";
-  ctx.font = "11px Cambria, serif";
+  ctx.fillStyle = "rgba(60, 45, 34, 0.95)";
+  ctx.font = "12px Cambria, serif";
   ctx.textAlign = "right";
   ctx.textBaseline = "middle";
 
   const ticks = 4;
+  const step = Math.max(1, Math.ceil(maxCount / ticks));
+  const maxValue = step * ticks;
   for (let i = 0; i <= ticks; i += 1) {
-    const value = Math.round((maxCount * i) / ticks);
+    const value = step * i;
     const y = padding.top + chartHeight - (chartHeight * i) / ticks;
     ctx.beginPath();
     ctx.moveTo(padding.left, y);
@@ -1861,13 +1863,13 @@ function renderMaintenanceChartFor(canvas, legend, series) {
   ctx.textBaseline = "top";
 
   series.forEach((item, index) => {
-    const barHeight = (chartHeight * item.count) / maxCount;
+    const barHeight = (chartHeight * item.count) / maxValue;
     const x = padding.left + index * slotWidth + barGap / 2;
     const y = padding.top + chartHeight - barHeight;
 
     ctx.fillStyle = "rgba(217, 119, 6, 0.85)";
     ctx.fillRect(x, y, barWidth, barHeight);
-    ctx.fillStyle = "rgba(92, 79, 66, 0.85)";
+    ctx.fillStyle = "rgba(60, 45, 34, 0.95)";
     ctx.fillText(item.label, x + barWidth / 2, padding.top + chartHeight + 6);
   });
 }
